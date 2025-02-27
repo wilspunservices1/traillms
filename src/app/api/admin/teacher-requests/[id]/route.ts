@@ -3,13 +3,13 @@ import { db } from "@/db/index";
 import { instructorApplications } from "@/db/schemas/instructor";
 import { user as users } from "@/db/schemas/user";
 import { eq } from "drizzle-orm";
-import { sendEmail } from "@/libs/emial/emailService"; // Adjust the path
-import { BASE_URL } from "@/actions/constant"; // Adjust the path
+import { sendEmail } from "@/libs/emial/emailService";
+import { BASE_URL } from "@/actions/constant";
 import { getSession } from "@/libs/auth";
 
 export async function PATCH(
   req: NextRequest,
-  context: { params: { id: string } } // ✅ Correct type for Next.js API Routes
+  context: { params: { id: string } } // ✅ Ensure correct usage of params
 ) {
   try {
     const session = await getSession();
@@ -20,7 +20,8 @@ export async function PATCH(
       );
     }
 
-    const { id } = context.params; // ✅ Ensure correct usage of params
+    // ✅ Correct way to access params in Next.js 13+
+    const id = context.params.id;
     const { action } = await req.json();
 
     // Fetch the instructor application
