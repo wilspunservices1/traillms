@@ -50,7 +50,7 @@ const HeroDashboard = () => {
     };
 
     fetchUserDetails();
-  }, [session]);
+  }, [isAdmin, isInstructor, session]);
 
   // Handle image upload completion from the CustomFileUpload component
   const handleImageUpload = async (imagePath) => {
