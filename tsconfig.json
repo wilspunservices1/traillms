@@ -1,0 +1,64 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "noEmit": true,
+    "incremental": true,
+    "module": "esnext",
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "baseUrl": ".", // Add this
+    "paths": { // Add this
+      "@/*": [
+        "src/*"
+      ],
+      "@/db": [
+        "src/db/index"
+      ],
+      "@/components/*": [
+        "src/components/*"
+      ]
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "strictNullChecks": true,
+    "target": "ES2017"
+  },
+  "include": [
+    "next-env.d.ts",
+    ".next/types/**/*.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "src/app/api/auth/[...nextauth]/route.ts",
+    "src/components/shared/user/DropdownUser.js",
+    "src/app/layout.js",
+    "src/components/shared/dashboards/_comp/UserDetails.js",
+    "src/components/sections/hero-banners/HeroDashboard.js",
+    "src/components/sections/create-course/_comp/CourseContent.tsx",
+    "src/components/sections/create-course/_comp/ImageField.tsx",
+    "src/app/api/upload/route.ts",
+    "src/components/sections/create-course/CreateCoursePrimary.js",
+    "src/components/shared/courses/CourseCard.js",
+    "src/components/sections/courses/CoursesPrimary.js",
+    "src/components/sections/courses/CoursesPrimary.js",
+    "src/app/test/page.js",
+    "src/app/test/test.js",
+    "src/app/courses/[id]/edit-course/page.js",
+    "src/components/sections/create-course/hooks/ChapterEditing.js"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

@@ -1,0 +1,1 @@
+ALTER TABLE "certification" ADD COLUMN "File_name" text DEFAULT 'file_name_here' NOT NULL;
