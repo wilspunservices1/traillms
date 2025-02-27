@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, FC } from 'react';
+import React, {useCallback, useEffect, useState, FC } from 'react';
 import Link from 'next/link';
 import useSweetAlert from '@/hooks/useSweetAlert';
 import EditQuiz from './EditQuiz';
@@ -58,41 +58,50 @@ const ManageQuestionnaire: FC<ManageQuestionnaireProps> = ({
   const [questionnaire, setQuestionnaire] = useState<Questionnaire | null>(null);
   const [userAnswers, setUserAnswers] = useState<{ [key: string]: string }>({});
 
-  useEffect(() => {
-    if (mode === 'take') {
-      fetchSingleQuestionnaire();
+
+const fetchQuestionnaires = useCallback(async () => {
+    setLoading(true); // Ensure loading state is updated before fetching
+    try {
+        const response = await fetch("/api/questionnaire/list");
+        if (!response.ok) throw new Error(`Failed to fetch questionnaires: ${response.status} - ${response.statusText}`);
+
+        const data = await response.json();
+        setQuestionnaires(data.questionnaires);
+    } catch (error) {
+        console.error("Error fetching questionnaires:", error);
+        showAlert("error", error instanceof Error ? error.message : "Failed to load questionnaires");
+    } finally {
+        setLoading(false);
+    }
+}, [showAlert]); // Empty dependency array since it doesn't rely on external variables
+
+const fetchSingleQuestionnaire = useCallback(async () => {
+    if (!questionnaireId) return; // Prevent API call if ID is missing
+
+    setLoading(true);
+    try {
+        const response = await fetch(`/api/courses/chapters/lectures/questionnaires/${questionnaireId}`);
+        if (!response.ok) throw new Error(`Failed to fetch questionnaire: ${response.status} - ${response.statusText}`);
+
+        const data = await response.json();
+        setQuestionnaire(data.questionnaire);
+    } catch (error) {
+        console.error("Error fetching questionnaire:", error);
+        showAlert("error", error instanceof Error ? error.message : "Failed to load quiz");
+    } finally {
+        setLoading(false);
+    }
+}, [questionnaireId, showAlert]); // Depend on `questionnaireId` since it determines the fetch
+
+// Automatically fetch data when `mode`, `questionnaireId`, or related functions change
+useEffect(() => {
+    if (mode === "take") {
+        fetchSingleQuestionnaire();
     } else {
-      fetchQuestionnaires();
+        fetchQuestionnaires();
     }
-  }, [questionnaireId, mode]);
+}, [mode, questionnaireId, fetchSingleQuestionnaire, fetchQuestionnaires]); // All dependencies are included safely
 
-  const fetchQuestionnaires = async () => {
-    try {
-      const response = await fetch('/api/questionnaire/list');
-      if (!response.ok) throw new Error('Failed to fetch questionnaires');
-      const data = await response.json();
-      setQuestionnaires(data.questionnaires);
-    } catch (error) {
-      console.error('Error fetching questionnaires:', error);
-      showAlert('error', 'Failed to load questionnaires');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchSingleQuestionnaire = async () => {
-    try {
-      const response = await fetch(`/api/courses/chapters/lectures/questionnaires/${questionnaireId}`);
-      if (!response.ok) throw new Error('Failed to fetch questionnaire');
-      const data = await response.json();
-      setQuestionnaire(data.questionnaire);
-    } catch (error) {
-      console.error('Error fetching questionnaire:', error);
-      showAlert('error', 'Failed to load quiz');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const toggleQuestionnaireExpansion = (id: string) => {
     setExpandedQuestionnaire(expandedQuestionnaire === id ? null : id);
@@ -124,21 +133,24 @@ const ManageQuestionnaire: FC<ManageQuestionnaireProps> = ({
     }
   };
 
-  const fetchCourses = async () => {
-    try {
-      const response = await fetch('/api/courses');
-      if (!response.ok) throw new Error('Failed to fetch courses');
-      const data = await response.json();
-      setCourses(data.courses);
-    } catch (error) {
-      console.error('Error fetching courses:', error);
-      showAlert('error', 'Failed to load courses');
-    }
-  };
-
+  const fetchCourses = useCallback(async () => {
+      try {
+          const response = await fetch("/api/courses");
+          if (!response.ok) throw new Error(`Failed to fetch courses: ${response.status} - ${response.statusText}`);
+  
+          const data = await response.json();
+          setCourses(data.courses);
+      } catch (error) {
+          console.error("Error fetching courses:", error);
+          showAlert("error", error instanceof Error ? error.message : "Failed to load courses");
+      }
+  }, [showAlert]); // Empty dependency array ensures function is memoized and does not change on re-renders
+  
+  // Fetch courses when the component mounts
   useEffect(() => {
-    fetchCourses();
-  }, []);
+      fetchCourses();
+  }, [fetchCourses]); // Now `fetchCourses` is safely included
+  
 
   const handleAnswerSelect = (questionId: string, answer: string) => {
     setUserAnswers(prev => ({
