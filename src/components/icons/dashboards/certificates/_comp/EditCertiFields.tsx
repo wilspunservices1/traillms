@@ -1,748 +1,746 @@
 "use client";
-import React, { useState, useCallback, useEffect } from "react";
-import Select, { MultiValue, SingleValue, ActionMeta } from "react-select";
-import Image from "next/image";
-import Draggable from "react-draggable";
-import { usePathname } from "next/navigation";
-import html2canvas from "html2canvas";
-import useSweetAlert from "@/hooks/useSweetAlert";
-import { v4 as uuidv4 } from "uuid";
-
-import useTab from "@/hooks/useTab";
-import DesignTab from "./DesignTab";
-import { debounce } from "lodash";
-import type { CertificateData, CertificatePlaceHolders } from "@/types/certificates";
-
-// import TabsButton from "./Tabs";
-// import { fetchcertificateDetails } from "@/actions/certification";
-import { initialPlaceholders } from "@/assets/mock";
-import { SettingsIcon, RefreshIcon, TestIcon } from "@/components/icons";
-import ReactCrop, { type Crop } from "react-image-crop";
+import React, { useState, useEffect } from "react";
+import Select, { SingleValue } from "react-select";
+import ReactCrop, { Crop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
-// import { getCroppedImg } from "@/utils/cropImage";
+import Draggable from "react-draggable";
+import html2canvas from "html2canvas";
+import { debounce } from "lodash";
+import { v4 as uuidv4 } from "uuid";
+import Image from "next/image";
+
+import { useCallback, useMemo, useRef } from "react";
+
+// Icons, Hooks, and Components
+import { SettingsIcon, RefreshIcon, TestIcon } from "@/components/icons";
+import useSweetAlert from "@/hooks/useSweetAlert";
+import useTab from "@/hooks/useTab";
+import TabsButton from "./Tabs"; // (If you need this)
+import DesignTab from "./DesignTab"; // Your additional design functionality
+
+// Types from your /types/certificates
+import type { CertificateData } from "@/types/certificates";
+
+// Local mock or shared placeholders
+import { initialPlaceholders } from "@/assets/mock";
+
+// Utility for cropping (if needed)
+import { getCroppedImg } from "@/utils/cropImage";
 import DownloadIcon from "@/components/sections/create-course/_comp/Certificate/Icon/DownloadIcon";
 
-interface metadata {
-  file_name?: string;
-  courseName?: string;
-  instructor?: string;
-  courseDuration?: string;
+interface APICertificate {
+	id: string;
+	owner_id: string;
+	certificate_data_url: string;
+	description: string;
+	is_published: boolean;
+	unique_identifier: string;
+	title: string;
+	expiration_date: string;
+	is_revocable: boolean;
+	created_at: string;
+	updated_at: string;
+	deleted_at: string | null;
+	is_enabled: boolean;
+	orientation: string;
+	max_download: number;
+	is_deleted: boolean;
+	course_id: string;
+	file_name: string;
+	metadata: {
+		courseName?: string;
+		instructor?: string;
+		courseDuration?: string;
+		file_name: string;
+	};
+	placeholders: APIPlaceholder[];
 }
 
-interface certificate {
-  id: string;
-  certificate_data_url: string;
-  title?: string;
-  description: string;
-  unique_identifier: string;
-  metadata?: metadata;
-  placeholders?: CertificatePlaceHolders[];
+interface APIPlaceholder {
+	id: string;
+	certificate_id: string;
+	key: string;
+	discount: number;
+	label: string;
+	value: string;
+	x: number;
+	y: number;
+	font_size?: number;
+	is_visible?: boolean;
+	color?: string;
+	// Add other fields if they exist...
 }
 
-interface ImageOption {
-  value: string;
-  label: string;
+interface UIPlaceholder extends APIPlaceholder {
+	font_size: number; // from font_size
+	is_visible: boolean; // from is_visible
+	color: string; // from color
+}
+
+interface CertificateOption {
+	value: string; // The certificate's id
+	label: string; // title + unique_identifier
 }
 
 interface EditCertiFieldsProps {
-  setDesignData: (data: any) => void;
+	setDesignData: (data: any) => void;
 }
 
-// Utility function to convert label to key format
-const convertLabelToKey = (label: string) => {
-  return label
-    .replace(/\s+/g, " ") // Remove extra spaces
-    .trim() // Trim whitespace
-    .replace(/^[0-9]+/, "") // Remove numbers at the start
-    .replace(/[^a-zA-Z ]/g, "") // Remove special characters
-    .split(" ")
-    .map((word, index) =>
-      index === 0
-        ? word.toLowerCase()
-        : word.charAt(0).toUpperCase() + word.slice(1)
-    )
-    .join("");
-};
-
 const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
+	// Custom hook to get the current tab index
+	const { currentIdx } = useTab();
+	const showAlert = useSweetAlert();
 
-  const showAlert = useSweetAlert();
-  const pathname = usePathname();
-  const owner_id = pathname?.split("/").pop() || "";
+	const [allCertificates, setAllCertificates] = useState<APICertificate[]>(
+		[]
+	);
+	const [selectedCertificate, setSelectedCertificate] =
+		useState<APICertificate | null>(null);
 
-  const { currentIdx, handleTabClick } = useTab();
+	// This holds the placeholders for the currently selected certificate
+	const [selectedPlaceholders, setSelectedPlaceholders] = useState<
+		UIPlaceholder[]
+	>([]);
 
-  const [certificates, setCertificates] = useState<certificate[]>([]);
-  const [selectedCertificate, setSelectedCertificate] = useState<certificate | null>(null);
-  const [placeholders, setPlaceholders] = useState<CertificatePlaceHolders[]>([]);
-  const [loading, setLoading] = useState(false);
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+	const [showOptions, setShowOptions] = useState(false);
 
-  useEffect(() => {
-    fetchCertificates();
-  }, []);
+	// Crop states
+	const [crop, setCrop] = useState<Crop>({
+		unit: "%",
+		x: 25,
+		y: 25,
+		width: 50,
+		height: 50,
+	});
+	const [showCropper, setShowCropper] = useState(false);
 
-  const fetchCertificates = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch("@/src/app/api/certificates/get-saved");
-      if (!response.ok) throw new Error("Failed to fetch certificates");
-      const data = await response.json();
-      setCertificates(data.certificates);
-    } catch (error) {
-      showAlert("error", error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+	// Additional states from your existing code
+	const [isEditing, setIsEditing] = useState(false);
+	const [instructorName, setInstructorName] = useState("");
 
-  const handleSelectCertificate = (selectedOption) => {
-    const cert = certificates.find((c) => c.id === selectedOption.value);
-    if (cert) {
-      setSelectedCertificate(cert);
-      setPlaceholders(cert.placeholders || []);
-    }
-  };
+	const fetchUserCertificates = useCallback(async () => {
+		try {
+			setLoading(true);
+			const response = await fetch("/api/certificates/get-saved");
+			if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+			const data = await response.json();
 
+			if (!data || !Array.isArray(data.certificates)) {
+				throw new Error("Invalid data format from API.");
+			}
 
-  
-  const certificate_id = "";
+			setAllCertificates(data.certificates);
+		} catch (err: any) {
+			setError(err.message || "Failed to fetch certificates");
+			console.error("Error fetching certificates:", err);
+		} finally {
+			setLoading(false);
+		}
+	}, []);
 
-  const [certificateOptions, setCertificateOptions] = useState<ImageOption[]>([]);
+	// On mount, fetch certificates
+	useEffect(() => {
+		fetchUserCertificates();
+	}, [fetchUserCertificates]);
 
+	const handleSelectCertificate = (
+		newValue: SingleValue<CertificateOption>
+	) => {
+		if (!newValue) {
+			setSelectedCertificate(null);
+			setSelectedPlaceholders([]);
+			return;
+		}
 
-  // States
-  const [selectedImages, setSelectedImages] = useState<ImageOption[]>([]);
-  const [options, setOptions] = useState<ImageOption[]>([]);
-  const [history, setHistory] = useState<any[]>([]);
-  const [future, setFuture] = useState<any[]>([]);
+		// Find the certificate in state
+		const found = allCertificates.find(
+			(cert) => cert.id === newValue.value
+		);
+		if (!found) {
+			console.warn(
+				"Selected certificate not found in state:",
+				newValue.value
+			);
+			return;
+		}
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [instructorName, setInstructorName] = useState("");
+		// Store the selected certificate
+		setSelectedCertificate(found);
 
-  const [certificate_data_url, setcertificate_data_url] = useState<CertificateData | null>(null);
-  const [showOptions, setShowOptions] = useState(false);
-  const [crop, setCrop] = useState<Crop>({
-    unit: "%",
-    x: 25,
-    y: 25,
-    width: 50,
-    height: 50,
-  });
-  const [zoom, setZoom] = useState(1);
-  const [showCropper, setShowCropper] = useState(false);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+		// Convert placeholders to our UIPlaceholder structure
+		const placeholdersForCert: UIPlaceholder[] = found.placeholders.map(
+			(ph) => ({
+				...ph,
+				font_size: ph.font_size ?? 16,
+				is_visible: ph.is_visible !== false, // default true
+				color: ph.color ?? "#000000",
+			})
+		);
+		setSelectedPlaceholders(placeholdersForCert);
+	};
 
-  // Create a debounced save function for placeholder positions
-  const savePlaceholderPosition = useCallback(
-    debounce(async (placeholderId, x, y) => {
-      try {
-        const response = await fetch(
-          `/api/managecertificates/${certificate_id}`,
-          {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id: placeholderId, x, y }),
-          }
-        );
+	const handleCrop = useCallback(() => {
+		if (!selectedCertificate) {
+			showAlert("error", "No certificate to crop");
+			return;
+		}
 
-        if (!response.ok)
-          throw new Error("Failed to update placeholder position.");
-      } catch (error) {
-        console.error("Error saving placeholder position:", error);
-      }
-    }, 500), // ✅ Debounce for 500ms
-    [certificate_id]
-  );
+		const imageEl = document.querySelector(
+			"img[data-crop-source]"
+		) as HTMLImageElement;
+		if (!imageEl || !crop.width || !crop.height) {
+			showAlert("error", "Please select an area to crop");
+			return;
+		}
 
-  // Utility function to strip HTML tags
-  const stripHtmlTags = (html: string) => {
-    const doc = new DOMParser().parseFromString(html, "text/html");
-    return doc.body.textContent || "";
-  };
- 
+		try {
+			const canvas = document.createElement("canvas");
+			const scaleX = imageEl.naturalWidth / imageEl.width;
+			const scaleY = imageEl.naturalHeight / imageEl.height;
 
- // Handle selection changes
-  
-  const handleChange = (
-    newValue: SingleValue<certificateOptions>,
-    actionMeta: ActionMeta<certificateOptions>
-  ) => {
-    if (newValue) {
-      setSelectedImages([newValue]);
-      setcertificate_data_url({
-        id: certificate_id,
-        certificate_id: certificate_id,
-        certificate_data_url: newValue.value,
-        owner_id: owner_id,
-        is_published: false,
-        unique_identifier: "",
-        title: newValue.label,
-        is_revocable: false,
-        metadata: {
-          courseName: "",
-          instructor: "",
-          courseDuration: "",
-        },
-        created_at: "",
-        updated_at: "",
-      });
-    } else {
-      setSelectedImages([]);
-      setcertificate_data_url(null);
-    }
-  };
+			canvas.width = crop.width;
+			canvas.height = crop.height;
+			const ctx = canvas.getContext("2d");
+			if (!ctx) throw new Error("Failed to get 2D context");
 
-  // Fetch saved certificates images
-  const fetchImages = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch("/api/certificates/get-saved");
+			ctx.drawImage(
+				imageEl,
+				crop.x * scaleX,
+				crop.y * scaleY,
+				crop.width * scaleX,
+				crop.height * scaleY,
+				0,
+				0,
+				crop.width,
+				crop.height
+			);
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+			const croppedDataUrl = canvas.toDataURL("image/png");
 
-      const data = await response.json();
+			// Update local certificate with new image
+			setSelectedCertificate((prev) => {
+				if (!prev) return null;
+				return {
+					...prev,
+					certificate_data_url: croppedDataUrl,
+				};
+			});
 
-      if (!data || !data.certificates || !Array.isArray(data.certificates)) {
-        console.error("Invalid data format received from API:", data);
-        throw new Error("Invalid data format received from API.");
-      }
+			setShowCropper(false);
+			showAlert("success", "Image cropped successfully");
+		} catch (error) {
+			console.error("Error cropping image:", error);
+			showAlert("error", "Failed to crop image");
+		}
+	}, [selectedCertificate, crop, showAlert]);
 
-      const fetchedImages: ImageOption[] = data.certificates.map(
-        (cert: certificate) => ({
-          value: cert.certificate_data_url,
-          label: `${stripHtmlTags(
-            cert.description || `certificate ${cert.unique_identifier}`
-          )} - ${cert.metadata?.courseName || "No Course Name"}`,
-        })
-      );
+	const handleDownload = useCallback(async () => {
+		const container = document.querySelector(".certificate-container");
+		if (!container) return;
 
+		try {
+			const canvas = await html2canvas(container as HTMLElement, {
+				useCORS: true,
+				allowTaint: true,
+				backgroundColor: "#fff",
+				scale: 2,
+			});
 
-      setOptions(fetchedImages);
-      setPlaceholders(data.certificates.placeholders);
-    } catch (error: any) {
-      console.error("Error fetching existing images:", error);
-      setError(
-        error.message || "Failed to load certificates. Please try again later."
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+			const dataUrl = canvas.toDataURL("image/png");
+			const link = document.createElement("a");
+			link.href = dataUrl;
+			link.download = `certificate-${Date.now()}.png`;
+			link.click();
 
-  useEffect(() => {
-    fetchImages();
-  }, [fetchImages]);
+			showAlert("success", "Certificate downloaded successfully");
+		} catch (error) {
+			console.error("Download error:", error);
+			showAlert("error", "Failed to download certificate");
+		}
+	}, [showAlert]);
 
-  // Your existing handlers
-  const handleSavecertificate = async () => {
-    // ... your save logic ...
-  };
+	const certificateIdx = selectedCertificate?.id;
 
-  const handleUndo = () => {
-    if (history.length > 0) {
-      const previousState = history[history.length - 1];
-      setFuture((prev) => [certificate_data_url, ...prev]);
-      setDesignData(previousState);
-      setHistory((prev) => prev.slice(0, prev.length - 1));
-    }
-  };
+	// Debounced Update for Coordinates
+	const updatePlaceholderCoordinates = useCallback(
+		async (placeholderId: string, x: number, y: number) => {
+			try {
+				// If no certificate is selected, do nothing
+				if (!certificateIdx) return;
+				const response = await fetch(
+					`/api/manageCertificates/${certificateIdx}`,
+					{
+						method: "PATCH",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({ placeholderId, x, y }),
+					}
+				);
+				if (!response.ok) {
+					console.error(
+						"Failed to update placeholder in DB, status:",
+						response.status
+					);
+				}
+			} catch (err) {
+				console.error("Error updating placeholder in DB:", err);
+			}
+		},
+		[certificateIdx] // The function depends on the current certificate ID
+	);
 
-  const handleRedo = () => {
-    if (future.length > 0) {
-      const nextState = future[0];
-      setHistory((prev) => [...prev, certificate_data_url]);
-      setDesignData(nextState);
-      setFuture((prev) => prev.slice(1));
-    }
-  };
+	/**
+	 * 2) A debounced version of that callback, memoized with `useMemo`.
+	 */
+	const debouncedUpdatePlaceholderCoordinates = useMemo(
+		() => debounce(updatePlaceholderCoordinates, 500),
+		[updatePlaceholderCoordinates] // Rebuild the debounced fn if `updatePlaceholderCoordinates` changes
+	);
 
-  // Simple and working download handler
-  const handleDownload = useCallback(async () => {
-    const certificateElement = document.querySelector(".certificate-container");
-    if (!certificateElement) return;
+	// This function is triggered after dragging stops
+	const savePlaceholderPosition = (
+		placeholderId: string,
+		x: number,
+		y: number
+	) => {
+		debouncedUpdatePlaceholderCoordinates(placeholderId, x, y);
+	};
 
-    try {
-      const canvas = await html2canvas(certificateElement as HTMLElement, {
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: "#ffffff",
-        scale: 2,
-      });
+	useEffect(() => {
+		return () => {
+			debouncedUpdatePlaceholderCoordinates.cancel();
+		};
+	}, [debouncedUpdatePlaceholderCoordinates]);
 
-      const dataUrl = canvas.toDataURL("image/png");
-      const link = document.createElement("a");
-      link.download = `certificate-${Date.now()}.png`;
-      link.href = dataUrl;
-      link.click();
+	const handleSaveChanges = async () => {
+		try {
+			if (!selectedCertificate) {
+				showAlert("error", "No certificate selected");
+				return;
+			}
+			// Example: we can do a PUT/PATCH to your backend with updated placeholders
+			console.log(
+				"Saving changes => certificate:",
+				selectedCertificate.id
+			);
+			console.log("Placeholders =>", selectedPlaceholders);
 
-      // Show success alert
-      showAlert("success", "certificate downloaded successfully");
-    } catch (error) {
-      console.error("Error downloading certificate:", error);
-      showAlert("error", "Failed to download certificate");
-    }
-  }, [showAlert]);
+			showAlert("success", "Certificate changes saved successfully");
+		} catch (err) {
+			console.error("Error saving changes:", err);
+			showAlert("error", "Failed to save changes");
+		}
+	};
 
-  // Add this function to handle crop completion
-  const handleCropComplete = useCallback(
-    (croppedImage: string) => {
-      const newImages = [...selectedImages];
-      newImages[0] = {
-        ...newImages[0],
-        value: croppedImage,
-      };
-      setSelectedImages(newImages);
-      setShowCropper(false);
-    },
-    [selectedImages]
-  );
+	const togglePlaceholderVisibility = async (placeholderId, isVisible) => {
+		try {
+			const response = await fetch(`/api/placeholders/${placeholderId}`, {
+				method: "PATCH",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ is_visible: isVisible }),
+			});
 
-  // Add this function to handle crop
-  const handleCrop = useCallback(() => {
-    const image = document.querySelector(
-      "img[data-crop-source]"
-    ) as HTMLImageElement;
-    if (!image || !crop.width || !crop.height) {
-      showAlert("error", "Please select an area to crop");
-      return;
-    }
+			if (!response.ok) {
+				throw new Error("Failed to update visibility");
+			}
 
-    try {
-      const canvas = document.createElement("canvas");
-      const scaleX = image.naturalWidth / image.width;
-      const scaleY = image.naturalHeight / image.height;
+			console.log(
+				`Placeholder ${placeholderId} visibility updated to ${isVisible}`
+			);
+		} catch (error) {
+			console.error("Error updating placeholder visibility:", error);
+		}
+	};
 
-      canvas.width = crop.width;
-      canvas.height = crop.height;
+	return (
+		<div className="p-4">
+			{/* Certificate Selection Dropdown */}
+			<div className="mb-4">
+				<Select
+					options={allCertificates.map((cert) => ({
+						value: cert.id,
+						label: `${cert.title} - ${cert.unique_identifier}`, // Title + unique_identifier
+					}))}
+					onChange={handleSelectCertificate}
+					isLoading={loading}
+					placeholder="Select a certificate..."
+					className="react-select-container"
+					classNamePrefix="react-select"
+					isSearchable
+				/>
+			</div>
 
-      const ctx = canvas.getContext("2d");
-      if (!ctx) {
-        throw new Error("Failed to get canvas context");
-      }
+			{selectedCertificate && (
+				<div className="mb-6">
+					{/* Control Buttons */}
+					<div className="flex space-x-4 mb-4">
+						<button
+							onClick={() => setShowOptions(!showOptions)}
+							className="flex items-center space-x-2 bg-blue text-white px-4 py-2 rounded-lg"
+						>
+							<SettingsIcon size={24} color="white" />
+							<span>Options</span>
+						</button>
 
-      // Create a new image with crossOrigin set
-      const img = new HTMLImageElement();
-      img.crossOrigin = "anonymous";
-      img.onload = () => {
-        ctx.drawImage(
-          img,
-          crop.x * scaleX,
-          crop.y * scaleY,
-          crop.width * scaleX,
-          crop.height * scaleY,
-          0,
-          0,
-          crop.width,
-          crop.height
-        );
+						<button
+							onClick={() =>
+								setSelectedPlaceholders(
+									initialPlaceholders.map((ph: any) => ({
+										// Convert your initial placeholders to the same shape
+										...ph,
+										font_size: ph.font_size || 16,
+										is_visible: true,
+										id: ph.id || uuidv4(), // generate if missing
+									}))
+								)
+							}
+							className="flex items-center space-x-2 bg-red-500 text-white px-4 py-2 rounded-lg"
+						>
+							<RefreshIcon size={24} color="white" />
+							<span>Reset</span>
+						</button>
 
-        try {
-          const croppedImageData = canvas.toDataURL("image/png");
-          handleCropComplete(croppedImageData);
-          showAlert("success", "Image cropped successfully");
-        } catch (error) {
-          console.error("Error converting to data URL:", error);
-          showAlert("error", "Failed to process cropped image");
-        }
-      };
+						{/* <button
+							onClick={handleSaveChanges}
+							className="flex items-center space-x-2 bg-green-500 text-white px-4 py-2 rounded-lg"
+						>
+							<TestIcon size={24} color="white" />
+							<span>Save Changes</span>
+						</button> */}
 
-      img.onerror = () => {
-        showAlert("error", "Failed to load image for cropping");
-      };
+						<button
+							onClick={handleDownload}
+							className="flex items-center space-x-2 bg-yellow text-white px-4 py-2 rounded-lg"
+						>
+							<DownloadIcon width={24} color="white" />
+							<span>Download</span>
+						</button>
+					</div>
 
-      img.src = image.src;
-    } catch (error) {
-      console.error("Error cropping image:", error);
-      showAlert("error", "Failed to crop image");
-    }
-  }, [crop, handleCropComplete, showAlert]);
+					{/* Options Panel (Placeholder Settings) */}
+					{showOptions && (
+						<div className="mb-4 p-4 border rounded bg-gray-100">
+							<h3 className="text-lg font-bold mb-4">
+								Placeholder Settings
+							</h3>
+							<Select
+								isMulti
+								options={selectedPlaceholders.map((p) => ({
+									value: p.id,
+									label: p.label,
+								}))}
+								value={selectedPlaceholders
+									.filter((p) => p.is_visible)
+									.map((p) => ({
+										value: p.id,
+										label: p.label,
+									}))}
+								onChange={(selected) => {
+									const selectedIds =
+										selected?.map((opt) => opt.value) || [];
+									setSelectedPlaceholders((prev) =>
+										prev.map((ph) => {
+											const newVisibility =
+												selectedIds.includes(ph.id);
+											if (
+												ph.is_visible !== newVisibility
+											) {
+												togglePlaceholderVisibility(
+													ph.id,
+													newVisibility
+												); // API call
+											}
+											return {
+												...ph,
+												is_visible: newVisibility,
+											};
+										})
+									);
+								}}
+								className="mb-4"
+							/>
+							<button
+								onClick={() => {
+									setSelectedPlaceholders((prev) =>
+										prev.map((ph) => {
+											if (!ph.is_visible) {
+												togglePlaceholderVisibility(
+													ph.id,
+													true
+												); // Restore in DB
+												return {
+													...ph,
+													is_visible: true,
+												};
+											}
+											return ph;
+										})
+									);
+								}}
+								className="mt-4 px-4 py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition duration-300"
+							>
+								Show Hidden Placeholders
+							</button>
 
-  // Add this function to handle saving the certificate
-  const handleSaveChanges = async () => {
-    setLoading(true);
-    try {
-      if (!certificate_data_url) {
-        throw new Error("certificate data is missing");
-      }
+							{selectedPlaceholders.map((ph) => (
+								<div
+									key={ph.id}
+									className="mb-2 flex items-center justify-between"
+								>
+									<span>{ph.label}</span>
+									<div className="flex items-center space-x-2">
+										<label className="text-sm">
+											Font Size:
+										</label>
+										<input
+											type="number"
+											value={ph.font_size}
+											onChange={(e) => {
+												const size = Math.max(
+													8,
+													Math.min(
+														72,
+														parseInt(
+															e.target.value
+														) || 16
+													)
+												);
+												setSelectedPlaceholders(
+													(prev) =>
+														prev.map((item) =>
+															item.id === ph.id
+																? {
+																		...item,
+																		font_size:
+																			size,
+																  }
+																: item
+														)
+												);
+											}}
+											className="w-16 px-2 py-1 border rounded"
+											min={8}
+											max={72}
+										/>
+									</div>
+								</div>
+							))}
+						</div>
+					)}
 
-      if (!certificate_data_url.id || certificate_data_url.id.trim() === "") {
-        throw new Error("certificate ID is missing or empty");
-      }
+					{/* Crop Button */}
+					<button
+						onClick={() => setShowCropper(true)}
+						className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+					>
+						Crop Certificate
+					</button>
 
-      console.log("certificate data before saving:", certificate_data_url);
+					{/* Cropper */}
+					{showCropper ? (
+						<div className="fixed inset-0 z-50 bg-white p-4">
+							<div className="max-w-4xl mx-auto">
+								<ReactCrop
+									crop={crop}
+									onChange={(c) => setCrop(c)}
+									aspect={842 / 595} // e.g., A4 ratio
+								>
+									<Image
+										data-crop-source
+										src={
+											selectedCertificate.certificate_data_url
+										}
+										alt="Certificate to crop"
+										className="max-w-full"
+										crossOrigin="anonymous"
+										width={1280}
+										height={904}
+										style={{
+											width: "100%",
+											height: "auto",
+										}}
+									/>
+								</ReactCrop>
 
-      const isValidUUID = (uuid: string) => {
-        const uuidRegex =
-          /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-        return uuidRegex.test(uuid);
-      };
+								<div className="mt-4 flex justify-end gap-2">
+									<button
+										onClick={() => setShowCropper(false)}
+										className="px-4 py-2 bg-gray-500 text-white rounded"
+									>
+										Cancel
+									</button>
+									<button
+										onClick={handleCrop}
+										className="px-4 py-2 bg-blue text-white rounded"
+									>
+										Apply Crop
+									</button>
+								</div>
+							</div>
+						</div>
+					) : (
+						// Certificate Display + Draggable Placeholders
+						<div className="certificate-container relative w-[842px] h-[595px] mx-auto bg-white">
+							<Image
+								src={selectedCertificate.certificate_data_url}
+								alt={`${selectedCertificate.title} - ${selectedCertificate.unique_identifier}`}
+								className="w-full h-full object-contain"
+								crossOrigin="anonymous"
+								width={1280}
+								height={904}
+								style={{ width: "100%", height: "auto" }}
+							/>
+							<div className="absolute inset-0 p-8">
+								{selectedPlaceholders
+									.filter((ph) => ph.is_visible)
+									.map((placeholder, index) => (
+										<Draggable
+											key={placeholder.id}
+											defaultPosition={{
+												x: placeholder.x || 0,
+												y: placeholder.y || 0,
+												font_size: placeholder.font_size,
+												color: placeholder.color,
+												value: placeholder.value
+											}}
+											bounds="parent"
+											onStop={(e, data) => {
+												// Update local placeholders with new position
+												setSelectedPlaceholders(
+													(prev) =>
+														prev.map((item) =>
+															item.id ===
+															placeholder.id
+																? {
+																		...item,
+																		x: data.x,
+																		y: data.y,
+																  }
+																: item
+														)
+												);
+												// Debounced position save
+												savePlaceholderPosition(
+													placeholder.id,
+													data.x,
+													data.y
+												);
+											}}
+										>
+											<div className="absolute cursor-move group">
+												<input
+													type="text"
+													value={placeholder.value}
+													onChange={(e) => {
+														const updatedVal =
+															e.target.value;
+														setSelectedPlaceholders(
+															(prev) =>
+																prev.map(
+																	(item) =>
+																		item.id ===
+																		placeholder.id
+																			? {
+																					...item,
+																					value: updatedVal,
+																			  }
+																			: item
+																)
+														);
+													}}
+													className="bg-transparent hover:bg-white/50 focus:bg-white/50 
+                            border border-transparent hover:border-gray-300 
+                            focus:border-blue-500 rounded px-2 py-1 outline-none transition-all"
+													style={{
+														fontSize: `${placeholder.font_size}px`,
+														minWidth: "100px",
+													}}
+													placeholder={
+														placeholder.label || ""
+													}
+												/>
+											</div>
+										</Draggable>
+									))}
+							</div>
+						</div>
+					)}
 
-      if (!isValidUUID(Certificate.id)) {
-        console.error("Invalid certificate ID:", Certificate.id);
-        throw new Error(`Invalid certificate ID: ${Certificate.id}`);
-      }
+					{/* Final Save Changes Button */}
+					<div className="flex justify-center mt-4">
+						<button
+							onClick={handleSaveChanges}
+							className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg"
+						>
+							Save Changes
+						</button>
+					</div>
+				</div>
+			)}
 
-      // ✅ Ensure placeholders retain their original IDs // ! warning i added this line
-      const updatedPlaceholders = placeholders.map((p) => ({
-        id: isValidUUID(p.id) ? p.id : uuidv4(), // Keep existing UUIDs
-        certificate_id: p.certificate_id,
-        key: p.key ? p.key : convertLabelToKey(p.label), // Keep consistent keys
-        discount: p.discount,
-        x: p.x, // Ensure X position is stored
-        y: p.y, // Ensure Y position is stored
-        font_size: p.font_size,
-        is_visible: p.is_visible,
-        label: p.label,
-        color: p.color,
-        value: p.value,
-      }));
-
-      const payload = {
-        id: certificate_data_url.id,
-        image: selectedImages[0]?.value, // Include the certificate image
-        placeholders: updatedPlaceholders,
-      };
-
-      console.log("Payload for saving certificate:", payload);
-
-      const response = await fetch(
-        `/api/managecertificates/${certificate_data_url.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to update certificate");
-      }
-
-      const result = await response.json();
-      console.log("certificate updated successfully:", result);
-
-      // Update local state or perform any other necessary actions
-      setDesignData(result.data);
-      showAlert("success", "certificate updated successfully");
-    } catch (error) {
-      console.error("Error in handleSaveChanges:", error);
-      showAlert(
-        "error",
-        error instanceof Error ? error.message : "An unknown error occurred"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="p-4">
-      {/* certificate Selection */}
-      <div className="mb-4">
-        <Select
-          options={certificates.map((cert) => ({ value: cert.id, label: cert.unique_identifier }))}
-          value={selectedImages[0] || null}
-          onChange={handleSelectCertificate}
-          isLoading={loading}
-          placeholder="Select a certificate..."
-          className="react-select-container"
-          classNamePrefix="react-select"
-          noOptionsMessage={() =>
-        loading ? "Loading certificates..." : "No certificates available"
-          }
-          isSearchable
-        />
-        {selectedCertificate && (
-        <div className="relative mt-4">
-          <Image
-            src={selectedCertificate.certificate_data_url}
-            alt="Certificate"
-            width={800}
-            height={600}
-          />
-          {placeholders.map((ph) => (
-            <Draggable
-              key={ph.id}
-              defaultPosition={{ x: ph.x, y: ph.y }}
-              onStop={(e, data) => handlePlaceholderChange(ph.id, data.x, data.y)}
-            >
-              <div className="absolute cursor-move bg-white p-1 border">
-                {ph.label}
-              </div>
-            </Draggable>
-          ))}
-        </div>
-      )}
-
-      {selectedCertificate && (
-        <button onClick={handleSaveChanges} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
-          Save Changes
-        </button>
-      )}
-      </div>
-
-      {selectedImages.length > 0 && (
-        <div className="mb-6">
-          {/* Control Buttons */}
-          <div className="flex space-x-4 mb-4">
-            <button
-              onClick={() => setShowOptions(!showOptions)}
-              className="flex items-center space-x-2 bg-blue text-white px-4 py-2 rounded-lg"
-            >
-              <SettingsIcon size={24} color="white" />
-              <span>Options</span>
-            </button>
-            <button
-              onClick={() => setPlaceholders(initialPlaceholders)}
-              className="flex items-center space-x-2 bg-red-500 text-white px-4 py-2 rounded-lg"
-            >
-              <RefreshIcon size={24} color="white" />
-              <span>Reset</span>
-            </button>
-            <button
-              onClick={handleSaveChanges}
-              className="flex items-center space-x-2 bg-green-500 text-white px-4 py-2 rounded-lg"
-            >
-              <TestIcon size={24} color="white" />
-              <span>Save Changes</span>
-            </button>
-            <button
-              onClick={handleDownload}
-              className="flex items-center space-x-2 bg-yellow text-white px-4 py-2 rounded-lg"
-            >
-              <DownloadIcon width={24} color="white" />
-              <span>Download</span>
-            </button>
-          </div>
-
-          {/* Add this options panel right after the buttons */}
-          {showOptions && (
-            <div className="mb-4 p-4 border rounded bg-gray-100">
-              <h3 className="text-lg font-bold mb-4">Placeholder Settings</h3>
-              {Array.isArray(placeholders) && placeholders.length > 0 ? (
-                <>
-                  <Select
-                    isMulti
-                    options={placeholders.map((p) => ({
-                      value: p.id,
-                      label: p.label,
-                    }))}
-                    value={placeholders
-                      .filter((p) => p.isVisible)
-                      .map((p) => ({ value: p.id, label: p.label }))}
-                    onChange={(selected) => {
-                      const selectedIds =
-                        selected?.map((option) => option.value) || [];
-                      setPlaceholders((prev) =>
-                        prev.map((p) => ({
-                          ...p,
-                          isVisible: selectedIds.includes(p.id),
-                        }))
-                      );
-                    }}
-                    className="mb-4"
-                  />
-                  {placeholders.map((placeholder) => (
-                    <div
-                      key={placeholder.id}
-                      className="mb-2 flex items-center justify-between"
-                    >
-                      <span>{placeholder.label}</span>
-                      <div className="flex items-center space-x-2">
-                        <label className="text-sm">Font Size:</label>
-                        <input
-                          type="number"
-                          value={placeholder.fontSize || 16}
-                          onChange={(e) => {
-                            const size = Math.max(
-                              8,
-                              Math.min(72, parseInt(e.target.value) || 16)
-                            );
-                            setPlaceholders((prev) =>
-                              prev.map((p) =>
-                                p.id === placeholder.id
-                                  ? { ...p, fontSize: size }
-                                  : p
-                              )
-                            );
-                          }}
-                          className="w-16 px-2 py-1 border rounded"
-                          min="8"
-                          max="72"
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </>
-              ) : (
-                <p>No placeholders available</p>
-              )}
-            </div>
-          )}
-
-          {/* Add crop button */}
-          <button
-            onClick={() => setShowCropper(true)}
-            className="mb-4 px-4 py-2 bg-blue-500 text-green-500 rounded hover:bg-blue-600"
-          >
-            Crop certificate
-          </button>
-
-          {showCropper ? (
-            <div className="fixed inset-0 z-50 bg-white p-4">
-              <div className="max-w-4xl mx-auto">
-                <ReactCrop
-                  crop={crop}
-                  onChange={(c) => setCrop(c)}
-                  aspect={842 / 595}
-                >
-                  <img
-                    data-crop-source
-                    src={selectedImages[0].value}
-                    alt="certificate to crop"
-                    className="max-w-full"
-                    crossOrigin="anonymous"
-                  />
-                </ReactCrop>
-
-                <div className="mt-4 flex justify-end gap-2">
-                  <button
-                    onClick={() => setShowCropper(false)}
-                    className="px-4 py-2 bg-gray-500 text-white rounded"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleCrop}
-                    className="px-4 py-2 bg-blue text-white rounded"
-                  >
-                    Apply Crop
-                  </button>
-                </div>
-              </div>
-            </div>
-          ) : (
-              <img
-              <Image
-                src={selectedImages[0].value}
-                alt={selectedImages[0].label}
-                layout="fill"
-                objectFit="contain"
-                crossOrigin="anonymous"
-              />
-              {/* Editable Placeholders */}
-              <div className="absolute inset-0 p-8">
-                {Array.isArray(placeholders) &&
-                  placeholders.map(
-                    (placeholder, index) =>
-                      placeholder &&
-                      placeholder.isVisible && (
-                        <Draggable
-                          key={placeholder.id}
-                          defaultPosition={{
-                            x: placeholder.x ?? 0,
-                            y: placeholder.y ?? 0,
-                          }}
-                          bounds="parent"
-                          onStop={(e, data) => {
-                            setPlaceholders((prev) =>
-                              prev.map((p) =>
-                                p.id === placeholder.id
-                                  ? { ...p, x: data.x, y: data.y }
-                                  : p
-                              )
-                            );
-                            savePlaceholderPosition(
-                              placeholder.id,
-                              data.x,
-                              data.y
-                            ); // ✅ Debounced API call
-                          }}
-
-                          //! warning edited above
-                        >
-                          <div className="absolute cursor-move group">
-                            <input
-                              type="text"
-                              value={placeholder.value || ""}
-                              onChange={(e) => {
-                                const newPlaceholders = [...placeholders];
-                                newPlaceholders[index] = {
-                                  ...placeholder,
-                                  value: e.target.value,
-                                };
-                                setPlaceholders(newPlaceholders);
-                              }}
-                              className="bg-transparent hover:bg-white/50 focus:bg-white/50 
-                     border border-transparent hover:border-gray-300 
-                     focus:border-blue-500 rounded px-2 py-1 outline-none transition-all"
-                              style={{
-                                fontSize: `${placeholder.fontSize || 16}px`,
-                                minWidth: "100px",
-                              }}
-                              placeholder={placeholder.label || ""}
-                            />
-                          </div>
-                        </Draggable>
-                      )
-                  )}
-              </div>
-            </div>
-          )}
-
-          {/* Save Changes Button */}
-          <div className="flex justify-center mt-4">
-            <button
-              onClick={handleSaveChanges}
-              className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg"
-            >
-              Save Changes
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* DesignTab remains for other functionality */}
-      <div className="mt-4">
-        {currentIdx === 0 && (
-          <DesignTab
-            certificate_data_url={
-              certificate_data_url || {
-                id: certificate_id,
-                certificate_id: certificate_id,
-                imageUrl: "",
-                ownerId: "",
-                certificate_data_url: "",
-                is_published: false,
-                unique_identifier: "",
-                title: "",
-                is_revocable: false,
-                metadata: {
-                  courseName: "",
-                  instructor: "",
-                  courseDuration: "",
-                },
-                created_at: "",
-                updated_at: "",
-              }
-            }
-            isEditing={isEditing}
-            instructorName={instructorName}
-            setDesignData={setDesignData}
-            placeholders={placeholders}
-            setPlaceholders={setPlaceholders}
-          />
-        )}
-      </div>
-    </div>
-  );
+			{/* DesignTab remains for other functionality */}
+			<div className="mt-4">
+				{currentIdx === 0 && (
+					<DesignTab
+						certificateData={
+							selectedCertificate
+								? {
+										// Use only the fields that exist in CertificateData
+										id: selectedCertificate.id,
+										owner_id: selectedCertificate.owner_id,
+										certificate_data_url:
+											selectedCertificate.certificate_data_url,
+										description:
+											selectedCertificate.description,
+										is_published:
+											selectedCertificate.is_published,
+										unique_identifier:
+											selectedCertificate.unique_identifier,
+										title: selectedCertificate.title,
+										is_revocable:
+											selectedCertificate.is_revocable,
+										metadata: selectedCertificate.metadata,
+										created_at:
+											selectedCertificate.created_at,
+										updated_at:
+											selectedCertificate.updated_at,
+										// ...any other properties that actually exist in CertificateData
+								  }
+								: {
+										// Fallback object: also must match CertificateData
+										id: "",
+										owner_id: "",
+										certificate_data_url: "",
+										description: "",
+										is_published: false,
+										unique_identifier: "",
+										title: "",
+										is_revocable: false,
+										metadata: {
+											courseName: "",
+											instructor: "",
+											courseDuration: "",
+											file_name: "",
+										},
+										created_at: "",
+										updated_at: "",
+										// ...any other properties that actually exist in CertificateData
+								  }
+						}
+						// These props are okay to leave as is
+						isEditing={isEditing}
+						instructorName={instructorName}
+						setDesignData={setDesignData}
+						placeholders={selectedPlaceholders}
+						setPlaceholders={setSelectedPlaceholders}
+					/>
+				)}
+			</div>
+		</div>
+	);
 };
 
 export default EditCertiFields;
