@@ -41,14 +41,14 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx",
-    "src/app/api/auth/[...nextauth]/route.ts",
+  
     "src/components/shared/user/DropdownUser.js",
     "src/app/layout.js",
     "src/components/shared/dashboards/_comp/UserDetails.js",
     "src/components/sections/hero-banners/HeroDashboard.js",
     "src/components/sections/create-course/_comp/CourseContent.tsx",
     "src/components/sections/create-course/_comp/ImageField.tsx",
-    "src/app/api/upload/route.ts",
+
     "src/components/sections/create-course/CreateCoursePrimary.js",
     "src/components/shared/courses/CourseCard.js",
     "src/components/sections/courses/CoursesPrimary.js",
@@ -59,6 +59,7 @@
     "src/components/sections/create-course/hooks/ChapterEditing.js"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "src/app/api"
   ]
 }
