@@ -8,6 +8,7 @@ import { user } from "@/db/schemas/user";
 import { eq, sql } from "drizzle-orm";
 import { getServerSession } from "next-auth/next";
 import { v4 as uuidv4 } from "uuid";
+import { headers } from "next/headers";
 
 export const options = {
   providers: [
@@ -104,7 +105,7 @@ export const options = {
   },
 };
 
-export async function getSession(req: unknown) {
+export async function getSession() {
   return await getServerSession(options);
 }
 

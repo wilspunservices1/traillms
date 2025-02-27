@@ -1,15 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
-  unoptimized: true,
   images : {
+    unoptimized: true,
     remotePatterns : [
-      // {
-      //   protocol : 'https',
-      //   hostname : '***/res.cloudinary.com',
-      //   pathname : '/ddj5gisb3/image/upload/**',
-      //   port : '',
-      // }
       {
         protocol: 'https',
         hostname: 'res.cloudinary.com',

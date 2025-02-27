@@ -27,11 +27,9 @@ const CertificateDesigner: React.FC<CertificateDesignerProps> = ({ backgroundIma
   const [images, setImages] = useState<ImageElement[]>([]);
   const Stage = dynamic(
     () => import("react-konva").then((mod) => mod.Stage),
-    { ssr: false }
   );
   const Layer = dynamic(
     () => import("react-konva").then((mod) => mod.Layer),
-    { ssr: false }
   );
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const stageRef = useRef<any>(null);

@@ -11,27 +11,21 @@ import { redirect } from 'next/navigation';
 
 const ImageUploader = dynamic(
   () => import('@/components/certifications/ImageUploader'),
-  { ssr: false }
 );
 const TextInput = dynamic(
   () => import('@/components/certifications/TextInput'),
-  { ssr: false }
 );
 const SignaturePad = dynamic(
   () => import('@/components/certifications/SignaturePad'),
-  { ssr: false }
 );
 const CertificateCanvas = dynamic(
   () => import('@/components/certifications/CertificateCanvas'),
-  { ssr: false }
 );
 const PlaceholderPicker = dynamic(
   () => import('@/components/certifications/PlaceholderPicker'),
-  { ssr: false }
 );
 const ImageMultiSelect = dynamic(
   () => import('@/components/certifications/ImageMultiSelect'),
-  { ssr: false }
 );
 
 const CreateCertificationPage: React.FC = () => {

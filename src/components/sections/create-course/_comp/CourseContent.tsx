@@ -1,3 +1,4 @@
+'use client';
 import React, { useState, useEffect } from "react";
 import ButtonPrimary from "@/components/shared/buttons/ButtonPrimary";
 import ImageField from "./ImageField";
@@ -8,7 +9,7 @@ import Loader from "./Icons/Loader";
 import dynamic from "next/dynamic";
 
 // Dynamically import ReactQuill to avoid SSR issues
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+const ReactQuill = dynamic(() => import("react-quill"));
 import "react-quill/dist/quill.snow.css"; // Import Quill styles
 import { Session } from "next-auth";
 

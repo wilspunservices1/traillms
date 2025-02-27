@@ -45,11 +45,9 @@ const CertificateCanvas: React.FC<CertificateCanvasProps> = ({
   const showAlert = useSweetAlert();
   const Stage = dynamic(
     () => import("react-konva").then((mod) => mod.Stage),
-    { ssr: false }
   );
   const Layer = dynamic(
     () => import("react-konva").then((mod) => mod.Layer),
-    { ssr: false }
   );
   // Undo/Redo stacks
   const [history, setHistory] = useState<

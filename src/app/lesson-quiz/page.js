@@ -1,11 +1,12 @@
+"use client";
 import LessonQuizMain from "@/components/layout/main/LessonQuizMain";
 import ThemeController from "@/components/shared/others/ThemeController";
 import PageWrapper from "@/components/shared/wrappers/PageWrapper";
 
-export const metadata = {
-  title: "Lesson Quiz | Meridian LMS - Education LMS Template",
-  description: "Lesson Quiz | Meridian LMS - Education LMS Template",
-};
+// export const metadata = {
+//   title: "Lesson Quiz | Meridian LMS - Education LMS Template",
+//   description: "Lesson Quiz | Meridian LMS - Education LMS Template",
+// };
 const Lesson_Quiz = () => {
   return (
     <PageWrapper>

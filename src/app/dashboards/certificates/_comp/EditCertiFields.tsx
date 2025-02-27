@@ -604,6 +604,7 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
 												y: placeholder.y || 0,
 												font_size: placeholder.font_size,
 												color: placeholder.color,
+												value: placeholder.value
 											}}
 											bounds="parent"
 											onStop={(e, data) => {

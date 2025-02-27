@@ -12,7 +12,7 @@ import { Session } from "next-auth";
 import useSweetAlert from "@/hooks/useSweetAlert";
 
 // Dynamically import ReactQuill to avoid 'document is not defined' error during SSR
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+const ReactQuill = dynamic(() => import("react-quill"));
 
 const CertificateForm: React.FC = () => {
   // State variables

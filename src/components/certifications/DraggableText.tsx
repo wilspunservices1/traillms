@@ -19,7 +19,7 @@ interface DraggableTextProps {
   texts: TextElement[]; // Added texts prop here
 }
 
-const Stage = dynamic(() => import("react-konva").then((mod) => mod.Stage), {    ssr: false,   });
+const Stage = dynamic(() => import("react-konva").then((mod) => mod.Stage));
 const DraggableText: React.FC<DraggableTextProps> = ({
   text,
   isSelected,

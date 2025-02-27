@@ -1,10 +1,11 @@
+'use client';
 import dynamic from 'next/dynamic';
 import DashboardContainer from "@/components/shared/containers/DashboardContainer";
 import ThemeController from "@/components/shared/others/ThemeController";
 import DsahboardWrapper from "@/components/shared/wrappers/DsahboardWrapper";
 import PageWrapper from "@/components/shared/wrappers/PageWrapper";
 
-const AddQuestionnaire = dynamic(() => import('@/components/sections/questionnaire/AddQuestionnaire.tsx'), {
+const AddQuestionnaire = dynamic(() => import('@/components/sections/questionnaire/AddQuestionnaire'), {
   ssr: false
 });
 

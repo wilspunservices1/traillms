@@ -1,3 +1,4 @@
+'use client';
 import InstructorDashbordMain from "@/components/layout/main/dashboards/InstructorDashbordMain";
 
 import DashboardContainer from "@/components/shared/containers/DashboardContainer";
@@ -6,14 +7,16 @@ import DsahboardWrapper from "@/components/shared/wrappers/DsahboardWrapper";
 import PageWrapper from "@/components/shared/wrappers/PageWrapper";
 import EditCertificate from "../../_comp/EditCertificate";
 
-export const metadata = {
-  title: "Instructor Dashboard | Meridian LMS - Education LMS Certification",
-  description: "Instructor Dashboard | Meridian LMS - Education LMS Certification",
-};
+// export const metadata = {
+//   title: "Instructor Dashboard | Meridian LMS - Education LMS Certification",
+//   description: "Instructor Dashboard | Meridian LMS - Education LMS Certification",
+// };
 
-function page({params} : {params : {id : string}}) {
+async function page({ params }: { params: { id: string } }) {
+  // Await params to ensure they are ready
+  const { id } = await params;
 
-  console.log("params",params.id)
+  console.log("params", id);
 
   return (
     <PageWrapper>
@@ -29,4 +32,4 @@ function page({params} : {params : {id : string}}) {
   )
 }
 
-export default page
+export default page;
