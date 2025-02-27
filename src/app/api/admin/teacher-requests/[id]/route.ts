@@ -8,13 +8,10 @@ import { sendEmail } from "@/libs/emial/emailService"; // Adjust the path
 import { BASE_URL } from "@/actions/constant"; // Adjust the path
 import { getSession } from "@/libs/auth";
 
-
-export async function PATCH(
-  req: Request,
-  context: any 
-) {
-	try {
-		const session = await getSession();
+export async function GET(req: NextRequest, context: any) {
+  try {
+   // @ts-expect-error - Override Next.js route type mismatch
+	const session = await getSession();
 		if (
 			!session ||
 			!session.user ||
@@ -25,8 +22,8 @@ export async function PATCH(
 				{ status: 401 }
 			);
 		}
-
-    const { id } = context.params as { id: string }; // ✅ Manually casting params
+ // @ts-expect-error - Override Next.js route type mismatch
+     const { id } = context.params;
   	const { action } = await req.json();
 
 		// Fetch the instructor application
