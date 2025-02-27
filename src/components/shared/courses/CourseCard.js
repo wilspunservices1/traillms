@@ -216,12 +216,14 @@ const CourseCard = ({ course, type, enrolledCourses }) => {
               )}
               {progress === 100 && (
                 <div>
-                  <Link
-                    href={`/courses/${id}/certificate`}
-                    className="text-size-15 text-whiteColor bg-secondaryColor w-full px-25px py-10px border border-secondaryColor hover:text-secondaryColor hover:bg-whiteColor rounded group text-nowrap text-center"
-                  >
-                    Download Certificate
-                  </Link>
+                  {isPurchased && (
+                          <button
+                            onClick={handleCertificateSelect}
+                            className="text-sm text-whiteColor bg-primaryColor border border-primaryColor px-26px py-0.5 leading-23px font-semibold hover:text-primaryColor hover:bg-whiteColor rounded inline-block dark:hover:bg-whiteColor-dark dark:hover:text-whiteColor"
+                          >
+                            Get Certificate
+                          </button>
+                        )}
                 </div>
               )}
             </div>
