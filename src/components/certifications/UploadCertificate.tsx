@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import type { CertificateData, CertificatePlaceHolders } from '@/types/certificates';
+import Image from "next/image";
+
 
 interface UploadCertificateProps {
   onTemplateSelect: (templateId: string) => void;
@@ -61,45 +63,47 @@ const UploadCertificate: React.FC<UploadCertificateProps> = ({ onTemplateSelect,
     }
   };
 
-  const fetchSavedCertificate = async (certificateId: string) => {
-    try {
-      setLoading(true);
-      const response = await fetch(`/api/certificates/${certificateId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch saved certificate');
-      }
-
-      const data = await response.json();
-      const fetchedCertificate = data.certificate; // Adjust based on your response structure
-
-      // Process fetched certificate and set it to state
-      const placeholders = await fetchPlaceholders(fetchedCertificate.id);
-      setCertificate({
-        ...fetchedCertificate,
-        placeholders: placeholders || [],
-      });
-      
-      onTemplateSelect(fetchedCertificate.id);
-    } catch (error) {
-      console.error('Error:', error);
-      setError(error instanceof Error ? error.message : 'Failed to load certificate');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchSavedCertificate = async (certificateId: string) => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/certificates/${certificateId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch saved certificate');
+        }
+
+        const data = await response.json();
+        const fetchedCertificate = data.certificate; // Adjust based on your response structure
+
+        // Process fetched certificate and set it to state
+        const placeholders = await fetchPlaceholders(fetchedCertificate.id);
+        setCertificate({
+          ...fetchedCertificate,
+          placeholders: placeholders || [],
+        });
+        
+        onTemplateSelect(fetchedCertificate.id);
+      } catch (error) {
+        console.error('Error:', error);
+        setError(error instanceof Error ? error.message : 'Failed to load certificate');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (status === 'authenticated' && savedCertificate) {
-      fetchSavedCertificate(savedCertificate.id);
+      if (savedCertificate.id) {
+        fetchSavedCertificate(savedCertificate.id);
+      }
     }
-  }, [status, savedCertificate]); // Add savedCertificate to dependencies
+  }, [status, savedCertificate, onTemplateSelect]); // Add savedCertificate to dependencies
 
   return (
     <div className="relative w-full aspect-[1.414] bg-white border rounded-md shadow-md p-4">
@@ -116,9 +120,9 @@ const UploadCertificate: React.FC<UploadCertificateProps> = ({ onTemplateSelect,
       )}
       {certificate && (
         <div className="relative">
-          {certificate.certificateData ? (
-            <img
-              src={certificate.certificateData}
+          {certificate.certificate_data_url ? (
+            <Image
+              src={certificate.certificate_data_url}
               alt="Certificate Template"
               className="w-full h-auto object-contain rounded"
               crossOrigin="anonymous"
@@ -134,7 +138,7 @@ const UploadCertificate: React.FC<UploadCertificateProps> = ({ onTemplateSelect,
                 left: `${placeholder.x}%`,
                 top: `${placeholder.y}%`,
                 transform: 'translate(-50%, -50%)',
-                fontSize: `${placeholder.fontSize}px`,
+                fontSize: `${placeholder.font_size}px`,
                 fontWeight: 'bold',
                 color: '#4B5563', // Tailwind's gray-700
               }}
