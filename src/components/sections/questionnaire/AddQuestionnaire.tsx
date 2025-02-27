@@ -36,7 +36,7 @@ const AddQuestionnaire: React.FC<AddQuestionnaireProps> = ({ onClose }) => {
       }
     };
     fetchCourses();
-  }, []);
+  }, [showAlert]);
 
   // Add new option field
   const handleAddOption = () => {
