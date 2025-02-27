@@ -45,7 +45,7 @@ export default function ActivatePage() {
       setErrorMessage("Invalid activation link.");
       alert("error", "Invalid activation link.");
     }
-  }, [router, token]);
+  }, [alert, router, token]);
 
   const handleResendActivation = async () => {
     setResending(true);
