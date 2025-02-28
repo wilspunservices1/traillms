@@ -1,47 +1,44 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: false,
-  images : {
-    unoptimized: true,
-    remotePatterns : [
+  // Enable React Strict Mode for better development experience
+  reactStrictMode: true,
+
+  // Image configuration
+  images: {
+    domains: ["res.cloudinary.com"],
+    remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'res.cloudinary.com',
-        pathname: '/ddj5gisb3/image/upload/**',
-      }
-    ]
-  }
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        pathname: "/ddj5gisb3/image/upload/**",
+      },
+    ],
+    // Only disable optimization if absolutely necessary
+    unoptimized: process.env.NODE_ENV === "development",
+  },
+
+  // Compiler options
+  compiler: {
+    // Remove console.log in production
+    removeConsole: process.env.NODE_ENV === "production",
+  },
+
+  // Webpack configuration for better module resolution
+  webpack: (config) => {
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+    };
+    return config;
+  },
+
+  // Experimental features
+  experimental: {
+    // Enable optimized page loading
+    optimizeCss: true,
+    // Better handling of hydration
+    scrollRestoration: true,
+  },
 };
 
 export default nextConfig;
-
-
-// https://res.cloudinary.com/ddj5gisb3/image/upload/v1728283106/courses/ai-generated-8136172_1280_a3p57l.png
-// /** @type {import('next').NextConfig} */
-// const nextConfig = {
-//   reactStrictMode: true,
-//   images: {
-//     remotePatterns: [
-//       {
-//         protocol: 'https',
-//         hostname: 'res.cloudinary.com',
-//         pathname: '/ddj5gisb3/image/upload/**',
-//       },
-//     ],
-//   },
-// };
-
-// export default nextConfig;
-
-
-
-
-
-// /** @type {import('next').NextConfig} */
-// const nextConfig = {
-//   reactStrictMode: false,
-// };
-
-// export default nextConfig;
-
-

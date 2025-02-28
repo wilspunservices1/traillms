@@ -22,6 +22,9 @@ import useSweetAlert from "@/hooks/useSweetAlert";
 import DownloadIcon from "@/components/sections/create-course/_comp/Certificate/Icon/DownloadIcon";
 import { v4 as uuidv4 } from "uuid";
 
+import Image from "next/image";
+
+
 interface Metadata {
 	courseName?: string;
 	instructor?: string;
@@ -94,6 +97,7 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
 	const showAlert = useSweetAlert();
 
 	// Create a debounced save function for placeholder positions
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const savePlaceholderPosition = useCallback(
 		debounce(async (placeholderId, x, y) => {
 			try {
@@ -293,7 +297,7 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
 			}
 
 			// Create a new image with crossOrigin set
-			const img = new Image();
+			const img = document.createElement('img');
 			img.crossOrigin = "anonymous";
 			img.onload = () => {
 				ctx.drawImage(
@@ -578,7 +582,7 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
 									onChange={(c) => setCrop(c)}
 									aspect={842 / 595}
 								>
-									<img
+									<Image
 										data-crop-source
 										src={selectedImages[0].value}
 										alt="Certificate to crop"
@@ -605,7 +609,7 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
 						</div>
 					) : (
 						<div className="certificate-container relative w-[842px] h-[595px] mx-auto bg-white">
-							<img
+							<Image
 								src={selectedImages[0].value}
 								alt={selectedImages[0].label}
 								className="w-full h-full object-contain"
@@ -623,11 +627,7 @@ const EditCertiFields: React.FC<EditCertiFieldsProps> = ({ setDesignData }) => {
 													defaultPosition={{
 														x: placeholder.x ?? 0,
 														y: placeholder.y ?? 0,
-														font_size:
-															placeholder.font_size ?? 16,
-														// font_family:
-														// 	placeholder.font_family ?? "Arial",
-														// fill: placeholder.fill ?? "#000000",
+														font_size: placeholder.font_size ?? 16,
 														color: placeholder.color ?? '',
 													}}
 													bounds="parent"

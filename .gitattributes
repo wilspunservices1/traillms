@@ -1,0 +1,2 @@
+public/uploads/files/ethical-hacking-reconnaissance-footprinting.zip filter=lfs diff=lfs merge=lfs -text
+*.zip filter=lfs diff=lfs merge=lfs -text

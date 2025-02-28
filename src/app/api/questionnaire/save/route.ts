@@ -85,11 +85,19 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     console.error("Error saving questionnaire:", error);
+    
+    // Improved error handling
+    const errorMessage = error instanceof z.ZodError 
+      ? error.errors.map(e => e.message).join(', ')
+      : error instanceof Error 
+        ? error.message 
+        : 'An unknown error occurred';
+
     return NextResponse.json(
       {
         success: false,
         error: "Failed to save questionnaire",
-        details: error instanceof z.ZodError ? error.errors : error.message,
+        details: errorMessage,
       },
       { status: 500 }
     );

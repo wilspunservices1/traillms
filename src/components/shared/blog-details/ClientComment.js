@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import useSweetAlert from "@/hooks/useSweetAlert"; 
+import Image from "next/image"
 
 const ClientComment = ({ commits, courseId }) => {
   const { data: session } = useSession();
@@ -76,7 +77,7 @@ const ClientComment = ({ commits, courseId }) => {
             {/* Main comment */}
             <div className="flex-shrink-0">
               <div>
-                <img
+                <Image
                   src={commit.avatar || "/fallback-image.jpg"}
                   alt={`${commit.user}'s Avatar`}
                   className="w-card-img py-[3px] rounded-full"
@@ -100,7 +101,7 @@ const ClientComment = ({ commits, courseId }) => {
                   {commit.replies.map((reply, replyIndex) => (
                     <li key={reply.id || replyIndex} className="flex gap-30px mb-5">
                       <div className="flex-shrink-0">
-                        <img
+                        <Image
                           src={reply.avatar || "/fallback-image.jpg"}
                           alt={`${reply.user}'s Avatar`}
                           className="w-card-img py-[3px] rounded-full"

@@ -9,7 +9,7 @@ import { questionnaires } from "@/db/schemas/questionnaire";
 
 // API handler to fetch the chapter by chapterId and then get all chapters of the same course with their lessons and extras
 export async function GET(req, { params }) {
-  const { chapterId } = params;
+  const { chapterId } = await params;
 
   try {
     // 1. Fetch the chapter by chapterId

@@ -28,7 +28,7 @@ const EditQuiz: React.FC<EditQuizProps> = ({ quizId, onClose }) => {
       }
     };
     fetchQuiz();
-  }, [quizId]);
+  }, [quizId,showAlert]);
 
   const handleSaveQuiz = async () => {
     if (!quizTitle.trim()) {

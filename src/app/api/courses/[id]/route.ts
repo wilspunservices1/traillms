@@ -191,7 +191,7 @@ export async function GET(
 	{ params }: { params: { id: string } }
 ) {
 	try {
-		const { id } = params;
+		const { id } = await params;
 
 		// Fetch the course by ID
 		const courseResult = await db

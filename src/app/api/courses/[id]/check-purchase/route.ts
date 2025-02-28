@@ -14,7 +14,7 @@ export async function GET(
 			return NextResponse.json({ hasPurchased: false }, { status: 401 });
 		}
 
-		const courseId = params.id;
+		const courseId = await params.id;
 		console.log("Checking purchase for courseId:", courseId);
 
 		// Fetch user's roles and enrolled courses

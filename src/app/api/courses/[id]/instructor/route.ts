@@ -9,7 +9,7 @@ import { userSocials } from '@/db/schemas/userSocials'; // Import userSocials sc
 import { eq } from 'drizzle-orm'; // For building conditions
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-  const courseId = params.id;
+  const courseId = await params.id;
 
   try {
     // Fetch the course, instructor, and instructor's social media details based on course ID
