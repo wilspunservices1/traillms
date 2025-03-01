@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NODE_ENV === "development" ? "http://localhost:3000" : process.env.NEXTAUTH_URL;
+const BASE_URL = process.env.NODE_ENV === "development" ? "https://traillms-wilspunservices1s-projects.vercel.app/" : process.env.NEXTAUTH_URL;
 const BASE_URL_API = `${BASE_URL}/api`;
 
 // https://ai-lms-nine.vercel.app
