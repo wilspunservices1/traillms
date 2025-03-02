@@ -1,14 +1,12 @@
 import CourseCard from "./CourseCard";
 
 const CoursesGrid = ({ courses, isNotSidebar, enrolledCourses }) => {
-  // console.log("courses grid", enrolledCourses);
   return (
     <div
-      className={`grid grid-cols-1 ${
-        isNotSidebar
+      className={`grid grid-cols-1 ${isNotSidebar
           ? "sm:grid-cols-2 xl:grid-cols-3"
           : "sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3"
-      } gap-30px items-stretch auto-rows-[1fr]`}
+        } gap-30px items-stretch auto-rows-[1fr]`}
     >
       {courses?.length ? (
         courses.map((course, idx) => (
@@ -20,13 +18,14 @@ const CoursesGrid = ({ courses, isNotSidebar, enrolledCourses }) => {
           />
         ))
       ) : (
-        <span>No courses found.</span>
+        <span></span>
       )}
     </div>
   );
 };
 
 export default CoursesGrid;
+
 
 // import CourseCard from "./CourseCard";
 
@@ -53,6 +52,4 @@ export default CoursesGrid;
 
 // export default CoursesGrid;
 
-{
-  /* <CourseCard key={idx} course={course} type={"primaryMd"} /> */
-}
+{/* <CourseCard key={idx} course={course} type={"primaryMd"} /> */ }

@@ -16,7 +16,7 @@ export default function Home() {
     <PageWrapper>
       <main>
         {/* home 10 */}
-        <Home3 />
+        <Home3/>
         <ThemeController />
       </main>
     </PageWrapper>

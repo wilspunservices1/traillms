@@ -103,7 +103,6 @@ const Extras: React.FC<Props> = ({ lessonId }) => {
 export default Extras;
 
 
-
 // "use client";
 
 // import { useEffect, useState } from "react";

@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   try {
     // Get session from your custom auth configuration
-    const session = await getSession(req);
+    const session = await getSession();
 
     // Check if the user is authenticated
     if (!session || !session.user) {

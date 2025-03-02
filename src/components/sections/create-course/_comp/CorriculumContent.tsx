@@ -45,7 +45,7 @@ const CurriculumContent: React.FC<CurriculumContentProps> = ({
               {/* Chapter Content */}
               <div className="p-4">
                 <ul>
-                  {chapter?.lectures?.filter(lecture => lecture !== undefined).map((lecture, idx) => (
+                  {chapter.lectures.filter(lecture => lecture !== undefined).map((lecture, idx) => (
                     <li
                       key={lecture.id} // Use lecture.id as the key
                       className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700"

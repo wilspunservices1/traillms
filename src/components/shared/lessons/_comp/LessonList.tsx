@@ -138,3 +138,129 @@ const LessonList: React.FC<Props> = ({
 };
 
 export default LessonList;
+
+
+// // LessonList.tsx
+// "use client";
+
+// import Link from "next/link";
+// import Extras from "./Extras";
+// import { useSession } from "next-auth/react";
+// import { useState, useEffect } from "react";
+// import { Session } from "next-auth";
+
+// // Define Lesson type for better type safety
+// interface Lesson {
+//   id: string;
+//   title: string;
+//   duration: string;
+//   isPreview: boolean;
+// }
+
+// interface Props {
+//   lessons: Lesson[]; // Define the prop type for lessons as an array of Lesson objects
+//   extras?: any;
+//   isEnrolled: boolean; // Indicates if the user is enrolled in the course
+//   courseOwnerId: string; // ID of the course owner (for instructor checks)
+// }
+
+// const LessonList: React.FC<Props> = ({
+//   lessons,
+//   extras,
+//   isEnrolled,
+//   courseOwnerId,
+// }) => {
+//   const { data: session } = useSession() as { data: Session | null };
+//   const user = session?.user;
+
+//   // Determine user roles
+//   const isSuperAdmin = user?.roles?.includes("superAdmin") ?? false;
+//   const isInstructor = user?.roles?.includes("instructor") ?? false;
+//   const isCourseOwner = user?.id === courseOwnerId;
+
+//   // Determine if the user can access all lessons
+//   const canAccessAll =
+//     isSuperAdmin || isEnrolled || (isInstructor && isCourseOwner);
+
+//   // State to manage which lessons to lock for non-enrolled users
+//   const [lockedLessons, setLockedLessons] = useState<string[]>([]);
+
+//   useEffect(() => {
+//     if (!canAccessAll) {
+//       // Lock lessons after the first two if user cannot access all lessons
+//       const initialLocked = lessons.slice(2).map((lesson) => lesson.id);
+//       setLockedLessons(initialLocked);
+//     } else {
+//       // No lessons are locked for users who have access
+//       setLockedLessons([]);
+//     }
+//   }, [canAccessAll, lessons]);
+
+//   // Determine if Extras should be displayed within LessonList
+//   const canAccessExtras = extras && canAccessAll;
+
+//   return (
+//     <ul>
+//       {lessons?.map((lesson) => {
+//         const isLocked = lockedLessons.includes(lesson.id);
+//         const canView =
+//           canAccessAll || (!isEnrolled && !isLocked && lesson.isPreview);
+
+//         return (
+//           <li
+//             key={lesson.id}
+//             className="py-4 flex items-center justify-between flex-wrap border-b border-borderColor dark:border-borderColor-dark"
+//           >
+//             <div>
+//               <h4 className="text-blackColor dark:text-blackColor-dark leading-1 font-light flex items-center">
+//                 <i
+//                   className={`icofont-video-alt mr-2 ${
+//                     isLocked ? "icofont-lock" : ""
+//                   }`}
+//                 ></i>
+//                 <Link
+//                   href={`/lessons/${lesson.id}`}
+//                   className="font-medium text-base text-contentColor dark:text-contentColor-dark hover:text-primaryColor dark:hover:text-primaryColor"
+//                 >
+//                   {lesson.title.length > 15
+//                     ? `${lesson.title.slice(0, 15)}...`
+//                     : lesson.title}
+//                 </Link>
+//                 {/* {isLocked ? (
+//                   <span className="text-gray-500">Locked Lesson</span>
+//                 ) : (
+//                   <Link
+//                     href={`/lessons/${lesson.id}`}
+//                     className="font-medium text-base text-contentColor dark:text-contentColor-dark hover:text-primaryColor dark:hover:text-primaryColor"
+//                   >
+//                     {lesson.title.length > 15
+//                       ? `${lesson.title.slice(0, 15)}...`
+//                       : lesson.title}
+//                   </Link>
+//                 )} */}
+//               </h4>
+//             </div>
+//             <div className="text-blackColor dark:text-blackColor-dark text-sm flex items-center">
+//               <p className="font-semibold">{lesson.duration} min</p>
+//               {canView && !isEnrolled && !isLocked && (
+//                 <Link
+//                   href={`/lessons/${lesson.id}`}
+//                   className="bg-primaryColor text-whiteColor text-sm ml-5 rounded py-0.5 px-2 flex items-center"
+//                 >
+//                   <i className="icofont-eye mr-1"></i> Preview
+//                 </Link>
+//               )}
+//             </div>
+//           </li>
+//         );
+//       })}
+//       {/* {canAccessExtras && (
+//         <li className="py-4 flex items-center justify-between flex-wrap border-b border-borderColor dark:border-borderColor-dark">
+//           <Extras lessonId={lessons[0].id} />
+//         </li>
+//       )} */}
+//     </ul>
+//   );
+// };
+
+// export default LessonList;

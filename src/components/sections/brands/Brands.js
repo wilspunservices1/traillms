@@ -6,6 +6,9 @@ import brandImage3 from "@/assets/images/brand/brand_3.png";
 import brandImage4 from "@/assets/images/brand/brand_4.png";
 import brandImage5 from "@/assets/images/brand/brand_5.png";
 import brandImage6 from "@/assets/images/brand/brand_6.png";
+import brandImage7 from "@/assets/images/brand/brand_7.png";
+import brandImage8 from "@/assets/images/brand/brand_8.png";
+import brandImage9 from "@/assets/images/brand/brand_9.png";
 import Link from "next/link";
 import Image from "next/image";
 const Brands = () => {
@@ -16,6 +19,9 @@ const Brands = () => {
     brandImage4,
     brandImage5,
     brandImage6,
+    brandImage7,
+    brandImage8,
+    brandImage9,
   ];
   return (
     <section className="bg-lightGrey10 dark:bg-lightGrey10-dark">

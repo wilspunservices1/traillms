@@ -7,7 +7,7 @@ import ActiveContent from "@/components/shared/dashboards/ActiveContent";
 import CompletedContent from "@/components/shared/dashboards/CompletedContent";
 import getAllCourses from "@/libs/getAllCourses";
 import { useSession } from "next-auth/react";
-import { fetchUserDetailsFromApi, changeProfileImage } from "@/actions/getUser";
+import { fetchUserDetailsFromApi, changeProfileImage } from "@/actions/getUser"; 
 import { useEffect, useState } from "react";
 
 const StudentEnrolledCourses = () => {
@@ -32,6 +32,7 @@ const StudentEnrolledCourses = () => {
 
     fetchUserDetails();
   }, [session]);
+
 
   // console.log("session -> .... working userDetails",userDetails && userDetails.enrolledCourses)
 
@@ -60,9 +61,7 @@ const StudentEnrolledCourses = () => {
   const tabbuttons = [
     {
       name: "ENROLLED COURSES",
-      content: (
-        <EnrolledContent enrolledCourses={userDetails?.enrolledCourses} />
-      ),
+      content: <EnrolledContent enrolledCourses={userDetails?.enrolledCourses} />,
     },
     // {
     //   name: "ACTIVE COURSES",
@@ -70,9 +69,7 @@ const StudentEnrolledCourses = () => {
     // },
     {
       name: "COMPLETED COURSES",
-      content: (
-        <CompletedContent enrolledCourses={userDetails?.enrolledCourses} />
-      ),
+      content: <CompletedContent enrolledCourses={userDetails?.enrolledCourses} />,
     },
   ];
   return (

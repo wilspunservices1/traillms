@@ -106,20 +106,20 @@ export async function POST(req: NextRequest) {
       .insert(courses)
       .values({
         title,
-        description,
-        price: parsedPrice, // Convert to float
         slug: uniqueSlug,
         lesson: lesson || "", // Handle missing optional fields
         duration: duration || "", // Handle missing optional fields
+        price: parsedPrice, // Convert to float
         estimatedPrice: parsedEstimatedPrice, // Convert to float
         isFree: isFree || false,
         tag: tag || "",
         skillLevel: skillLevel || "",
-        categories: Array.isArray(categories) ? categories : categories ? [categories] : [],
+        categories: Array.isArray(categories) ? categories : [categories] || [] ,
         insName,
         thumbnail,
         userId,
         demoVideoUrl,
+        description,
         discount: Number(discount.toFixed(2)), // Store discount percentage as number
       })
       .returning(); // Returning the created course

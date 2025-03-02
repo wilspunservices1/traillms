@@ -2,6 +2,7 @@
 import { db } from "@/db";
 import { user } from "@/db/schemas/user";
 import { desc, eq, like } from "drizzle-orm";
+
 const MAX_RETRIES = 5; // Maximum number of attempts to generate a unique identifier
 
 /**

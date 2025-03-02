@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import ProgressBanner from "./ProgressBanner";
@@ -9,7 +9,6 @@ interface EnrolledCourse {
   progress: number; // Use this progress value directly from backend
   completedLectures: string[]; // Array of completed lectures
   chapters: Chapter[];
-  assignedQuizId?: string; // New field for the assigned quiz ID
 }
 
 interface Chapter {
@@ -108,20 +107,6 @@ const UserCourses: React.FC<UserCoursesProps> = ({
         completedLectures={completedLessons} // Completed lessons from backend
         totalLectures={totalLessons} // Total lessons from course data
       />
-
-      {/* Display Assigned Quiz Section */}
-      {enrolledCourse.assignedQuizId && (
-        <div className="mt-6">
-          <h3 className="text-xl font-semibold">Assigned Quiz</h3>
-          <p className="text-gray-700">You have a quiz assigned for this course.</p>
-          <button 
-            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            onClick={() => {/* Logic to start the quiz */}}
-          >
-            Start Quiz
-          </button>
-        </div>
-      )}
     </div>
   );
 };

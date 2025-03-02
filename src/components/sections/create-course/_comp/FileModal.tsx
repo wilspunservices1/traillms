@@ -1,7 +1,5 @@
 // src/components/sections/create-course/_comp/FileModal.tsx
 import React, { useEffect, useRef } from "react";
-import Image from "next/image"
-
 
 export interface FileModalProps {
   isOpen: boolean;
@@ -43,7 +41,7 @@ const FileModal: React.FC<FileModalProps> = ({ isOpen, filePath, fileType, onClo
         />
       );
     } else if (fileType.startsWith("image")) {
-      return <Image src={filePath} alt="file" className="w-full h-auto" />;
+      return <img src={filePath} alt="file" className="w-full h-auto" />;
     } else if (fileType === "txt") {
       return (
         <iframe

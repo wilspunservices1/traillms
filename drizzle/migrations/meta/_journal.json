@@ -5,15 +5,50 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1739694238670,
-      "tag": "0000_outgoing_bromley",
+      "when": 1728281990671,
+      "tag": "0000_curved_scourge",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1739869261001,
-      "tag": "0001_condemned_misty_knight",
+      "when": 1728625991131,
+      "tag": "0001_powerful_zaladane",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1729148905200,
+      "tag": "0002_freezing_phalanx",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1729762188619,
+      "tag": "0003_flaky_legion",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1729762483919,
+      "tag": "0004_past_infant_terrible",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1729930280182,
+      "tag": "0005_dear_warhawk",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1740901771110,
+      "tag": "0006_jittery_frog_thor",
       "breakpoints": true
     }
   ]

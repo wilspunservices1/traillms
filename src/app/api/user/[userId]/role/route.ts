@@ -14,7 +14,7 @@ export async function PATCH(
   const { userId } = params;
 
   // Get the session
-  const session = await getSession(req);
+  const session = await getSession();
   console.log("Session data:", session);
 
   // Ensure the user is logged in

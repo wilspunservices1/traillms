@@ -3,8 +3,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-// import { Stage, Layer, Transformer } from 'react-konva';
-import dynamic from 'next/dynamic';
+import { Stage, Layer, Transformer } from 'react-konva';
 import { v4 as uuidv4 } from 'uuid';
 import { TextElement, ImageElement } from '@/types/type';
 import DraggableText from '../DraggableText'; // Component for draggable text
@@ -14,7 +13,6 @@ import { useSession } from 'next-auth/react';
 import 'react-toastify/dist/ReactToastify.css';
 import { Session } from 'next-auth';
 import useSweetAlert from '@/hooks/useSweetAlert';
-import { Transformer } from 'react-konva';
 
 interface CertificateDesignerProps {
   backgroundImage: string; // The background image for the certificate
@@ -25,12 +23,6 @@ const CertificateDesigner: React.FC<CertificateDesignerProps> = ({ backgroundIma
   const { data: session } = useSession() as { data: Session | null };
   const [texts, setTexts] = useState<TextElement[]>([]);
   const [images, setImages] = useState<ImageElement[]>([]);
-  const Stage = dynamic(
-    () => import("react-konva").then((mod) => mod.Stage),
-  );
-  const Layer = dynamic(
-    () => import("react-konva").then((mod) => mod.Layer),
-  );
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const stageRef = useRef<any>(null);
   const trRef = useRef<any>(null);

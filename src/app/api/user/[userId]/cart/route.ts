@@ -3,7 +3,6 @@ import { db } from "@/db";
 import { cart } from "@/db/schemas/cart";
 import { courses } from "@/db/schemas/courses";
 import { and, eq } from "drizzle-orm";
-import { NextApiRequest } from "next";
 
 // POST /api/user/[userId]/cart
 export async function POST(req: Request, { params }: { params: { userId: string } }) {
@@ -172,14 +171,16 @@ export async function PATCH(
 // DELETE /api/user/[userId]/cart?courseId=COURSE_ID
 
 
-export async function GET(req: NextApiRequest, context: { params: Promise<{ userId: string }> }) {
-  const { userId } = await context.params;  // Awaiting the params to ensure proper data fetching
+export async function GET(req: Request, { params }: { params: { userId: string } }) {
+  const { userId } = params;
 
   // Validate that userId is provided
   if (!userId) {
-    return new Response(JSON.stringify({ error: "User ID is required." }), { status: 400 });
+    return NextResponse.json(
+      { error: "User ID is required." },
+      { status: 400 }
+    );
   }
-
 
   try {
     // Fetch all cart items for the user

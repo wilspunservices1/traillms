@@ -1,118 +1,266 @@
+// FrameTemplate.tsx
 'use client';
-import React, { useRef, useState } from 'react';
-import Image from 'next/image';
-import html2canvas from 'html2canvas';
-import type { CertificateData, CertificatePlaceHolders } from '@/types/certificates';
+import React from 'react';
+import Draggable from 'react-draggable';
+import type { CertificatePlaceHolders, CertificateData } from '@/types/certificates';
+import { CldImage } from 'next-cloudinary';
 
 interface FrameTemplateProps {
-  certificateData: CertificateData;
-  placeholders: CertificatePlaceHolders[];
+  certificateData?: CertificateData;
+  placeholders?: CertificatePlaceHolders[];
   isEditing: boolean;
-  assignedValues: {
-    STUDENT_NAME: string;
-    INSTRUCTOR_NAME: string;
-    SESSION_NAME: string;
-    DATE_GENERATED: string;
-    CERTIFICATE_NUMBER: string;
-    [key: string]: string;
-  };
-  handleSetPlaceholderPosition: (id: string, x: number, y: number) => void;
+  assignedValues?: { [key: string]: string };
+  handleSetPlaceholderPosition: (id: string, x: number, y: number) => void; // Add this line
 }
 
 const FrameTemplate: React.FC<FrameTemplateProps> = ({
   certificateData,
-  placeholders,
+  placeholders = [],
   isEditing,
-  assignedValues,
-  handleSetPlaceholderPosition,
+  assignedValues = {},
+  handleSetPlaceholderPosition, // Add this line
 }) => {
-  const certificateRef = useRef<HTMLDivElement>(null);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editedValues, setEditedValues] = useState<{ [key: string]: string }>(assignedValues);
+  if (!certificateData) {
+    return <div>No certificate data available</div>;
+  }
 
-  const handleTextEdit = (id: string, value: string) => {
-    setEditedValues(prev => ({
-      ...prev,
-      [id]: value
-    }));
+  const renderContent = (value: string, fontSize: number) => {
+    if (isEditing) {
+      return value;
+    }
+    const key = value.replace(/\[|\]/g, '');
+    return assignedValues[key] || value;
   };
 
-  const handleDownload = async () => {
-    if (certificateRef.current) {
-      try {
-        const canvas = await html2canvas(certificateRef.current);
-        const link = document.createElement('a');
-        link.href = canvas.toDataURL('image/png');
-        link.download = 'certificate.png';
-        link.click();
-      } catch (error) {
-        console.error('Error downloading certificate:', error);
-      }
-    }
+  const handleDrag = (e: any, data: any, placeholder: CertificatePlaceHolders) => {
+    e.preventDefault(); // Prevent default behavior
+    const newX = placeholder.x + data.deltaX;
+    const newY = placeholder.y + data.deltaY;
+    handleSetPlaceholderPosition(placeholder.id, newX, newY); // Update position
   };
 
   return (
-    <div className="flex flex-col items-center p-4">
-      <div
-        ref={certificateRef}
-        className="relative w-full h-auto aspect-[1.414] certificate-container"
-        style={{
-          backgroundImage: `url(${certificateData?.certificateData})`,
-          backgroundSize: 'contain',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          boxShadow: 'none'
-        }}
-      >
-        {placeholders.map((placeholder) => (
-          placeholder.isVisible && (
+    <div
+      className="mt-8 border border-gray-300 rounded shadow-md relative"
+      style={{ width: '842px', height: '595px' }}
+    >
+      {certificateData.certificateData && (
+        <CldImage
+          src={certificateData.certificateData}
+          alt="Certificate Background"
+          className="absolute top-0 left-0 w-full h-full object-cover"
+          width={842}
+          height={595}
+          sizes="(max-width: 842px) 100vw, 842px"
+        />
+      )}
+
+      {placeholders.map((placeholder) =>
+        placeholder.isVisible ? (
+          <Draggable
+            key={placeholder.id}
+            onDrag={(e, data) => handleDrag(e, data, placeholder)}
+            disabled={!isEditing}
+            position={{ x: placeholder.x, y: placeholder.y }} // Control the position of the draggable
+          >
             <div
-              key={placeholder.id}
-              className="absolute"
+              className="p-2 rounded bg-transparent"
               style={{
-                left: `${placeholder.x}px`,
-                top: `${placeholder.y}px`,
-                fontSize: `${placeholder.fontSize}px`,
+                fontSize: placeholder.fontSize,
+                display: 'inline-block',
+                position: 'absolute',
+                left: 0, // We set these to zero because we're controlling the position with Draggable
+                top: 0,
+                zIndex: 1,
               }}
             >
-              {isEditing ? (
-                <input
-                  type="text"
-                  value={editedValues[placeholder.id] || placeholder.value}
-                  onChange={(e) => handleTextEdit(placeholder.id, e.target.value)}
-                  className={`
-                    p-2 bg-transparent border-2 
-                    ${editingId === placeholder.id 
-                      ? 'border-blue-400' 
-                      : 'border-transparent hover:border-gray-200'
-                    }
-                    focus:outline-none focus:border-blue-400
-                    transition-colors
-                  `}
-                  onFocus={() => setEditingId(placeholder.id)}
-                  onBlur={() => setEditingId(null)}
-                />
-              ) : (
-                <span className="p-2">
-                  {editedValues[placeholder.id] || placeholder.value}
-                </span>
-              )}
+              {renderContent(placeholder.value, placeholder.fontSize)}
             </div>
-          )
-        ))}
-      </div>
-
-      {/* Action Buttons */}
-      <div className="mt-4 flex gap-4">
-        <button
-          onClick={handleDownload}
-          className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-        >
-          Download Certificate
-        </button>
-      </div>
+          </Draggable>
+        ) : null
+      )}
     </div>
   );
 };
 
 export default FrameTemplate;
+
+
+
+
+
+// 'use client';
+// import React, { useEffect } from 'react';
+// import Draggable from 'react-draggable';
+// import type { CertificatePlaceHolders, CertificateData } from '@/types/certificates';
+// import { CldImage } from 'next-cloudinary';
+
+// interface FrameTemplateProps {
+//   certificateData?: CertificateData;
+//   placeholders?: CertificatePlaceHolders[];
+//   isEditing: boolean;
+//   assignedValues?: { [key: string]: string };
+// }
+
+// const FrameTemplate: React.FC<FrameTemplateProps> = ({
+//   certificateData,
+//   placeholders = [],
+//   isEditing,
+//   assignedValues = {},
+// }) => {
+//   if (!certificateData) {
+//     return <div>No certificate data available</div>;
+//   }
+
+//   const renderContent = (value: string, fontSize: number) => {
+//     // During editing, show placeholders; otherwise, replace with actual values
+//     if (isEditing) {
+//       return value;
+//     }
+//     const key = value.replace(/\[|\]/g, ''); // Extract key from placeholder format
+//     return assignedValues[key] || value; // Replace with actual value or keep placeholder if not found
+//   };
+
+//   // Log all placeholder data and computed values
+//   useEffect(() => {
+//     console.log('Placeholders data:');
+//     placeholders.forEach((placeholder) => {
+//       const key = placeholder.value.replace(/\[|\]/g, ''); // Extract key from placeholder format
+//       const actualValue = assignedValues[key] || placeholder.value; // Compute actual value
+//       console.log(`Placeholder ID: ${placeholder.id}`);
+//       console.log(`Label: ${placeholder.label}`);
+//       console.log(`Is Visible: ${placeholder.isVisible}`);
+//       console.log(`Font Size: ${placeholder.fontSize}`);
+//       console.log(`Position: (${placeholder.x}, ${placeholder.y})`);
+//       console.log(`Computed Value: ${actualValue}`);
+//       console.log('-------------------------');
+//     });
+//   }, [placeholders, assignedValues]); // Re-run effect when placeholders or assignedValues change
+
+//   // Handle drag event
+//   const handleDrag = (e: any, data: any, placeholder: CertificatePlaceHolders) => {
+//     console.log(`Dragging Placeholder ID: ${placeholder.id}`);
+//     console.log(`New Position: (${data.x}, ${data.y})`);
+//   };
+
+//   return (
+//     <div
+//       className="mt-8 border border-gray-300 rounded shadow-md relative"
+//       style={{ width: '842px', height: '595px' }}
+//     >
+//       {/* Render certificate background image */}
+//       {certificateData.certificateData && (
+//         <CldImage
+//           src={certificateData.certificateData}
+//           alt="Certificate Background"
+//           className="absolute top-0 left-0 w-full h-full object-cover"
+//           width={842}
+//           height={595}
+//           sizes="(max-width: 842px) 100vw, 842px"
+//         />
+//       )}
+
+//       {/* Render placeholders or actual content */}
+//       {placeholders.map((placeholder) =>
+//         placeholder.isVisible ? (
+//           <Draggable key={placeholder.id} onDrag={(e, data) => handleDrag(e, data, placeholder)} disabled={!isEditing}>
+//             <div
+//               className="p-2 rounded bg-transparent"
+//               style={{
+//                 fontSize: placeholder.fontSize,
+//                 display: 'inline-block',
+//                 position: 'absolute',
+//                 left: placeholder.x,
+//                 top: placeholder.y,
+//                 zIndex: 1, // Ensure placeholders are above the image
+//               }}
+//             >
+//               {renderContent(placeholder.value, placeholder.fontSize)}
+//             </div>
+//           </Draggable>
+//         ) : null
+//       )}
+//     </div>
+//   );
+// };
+
+// export default FrameTemplate;
+
+
+
+// // components/certifications/FrameTemplate.tsx
+// 'use client';
+// import React from 'react';
+// import Draggable from 'react-draggable';
+// import type { CertificatePlaceHolders, CertificateData } from '@/types/certificates';
+// import { CldImage } from 'next-cloudinary';
+
+// interface FrameTemplateProps {
+//   certificateData?: CertificateData;
+//   placeholders?: CertificatePlaceHolders[];
+//   isEditing: boolean;
+//   assignedValues?: { [key: string]: string };
+//   // setDesignData?:
+// }
+
+// const FrameTemplate: React.FC<FrameTemplateProps> = ({
+//   certificateData,
+//   placeholders = [],
+//   isEditing,
+//   assignedValues = {},
+// }) => {
+//   if (!certificateData) {
+//     return <div>No certificate data available</div>;
+//   }
+
+//   const renderContent = (value: string, fontSize: number) => {
+//     // During editing, show placeholders; otherwise, replace with actual values
+//     if (isEditing) {
+//       return value;
+//     }
+//     const key = value.replace(/\[|\]/g, ''); // Extract key from placeholder format
+//     return assignedValues[key] || value; // Replace with actual value or keep placeholder if not found
+//   };
+
+//   return (
+//     <div
+//       className="mt-8 border border-gray-300 rounded shadow-md relative"
+//       style={{ width: '842px', height: '595px' }}
+//     >
+//       {/* Render certificate background image */}
+//       {certificateData.certificateData && (
+//         <CldImage
+//           src={certificateData.certificateData}
+//           alt="Certificate Background"
+//           className="absolute top-0 left-0 w-full h-full object-cover"
+//           width={842}
+//           height={595}
+//           sizes="(max-width: 842px) 100vw, 842px"
+//         />
+//       )}
+
+//       {/* Render placeholders or actual content */}
+//       {placeholders.map((placeholder) =>
+//         placeholder.isVisible ? (
+//           <Draggable key={placeholder.id} disabled={!isEditing}>
+//             <div
+//               className="p-2 rounded bg-transparent"
+//               style={{
+//                 fontSize: placeholder.fontSize,
+//                 display: 'inline-block',
+//                 position: 'absolute',
+//                 left: placeholder.x,
+//                 top: placeholder.y,
+//                 zIndex: 1, // Ensure placeholders are above the image
+//               }}
+//             >
+//               {renderContent(placeholder.value, placeholder.fontSize)}
+//             </div>
+//           </Draggable>
+//         ) : null
+//       )}
+//     </div>
+//   );
+// };
+
+// export default FrameTemplate;

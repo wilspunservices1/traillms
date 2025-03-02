@@ -9,7 +9,7 @@ interface ManageCertiIconProps {
   ariaLabel?: string;
 }
 
-const  ManageCertiIcon: React.FC<ManageCertiIconProps> = ({
+const ManageCertiIcon: React.FC<ManageCertiIconProps> = ({
   size = 24,
   color = 'currentColor',
   className = '',

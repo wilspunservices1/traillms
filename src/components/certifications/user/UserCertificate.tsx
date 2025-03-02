@@ -1,8 +1,7 @@
 // src/components/UserCertificate.tsx
-'use client';
+
 import React, { useEffect, useState } from 'react';
-// import { Stage, Layer } from 'react-konva';
-import dynamic from 'next/dynamic';
+import { Stage, Layer } from 'react-konva';
 import { TextElement, ImageElement } from '@/types/type';
 import DraggableText from '../DraggableText'; // Adjusted import path
 import DraggableImage from '../DraggableImage'; // Adjusted import path
@@ -17,12 +16,7 @@ const UserCertificate: React.FC<UserCertificateProps> = ({ certificateId, userDa
   const [backgroundImage, setBackgroundImage] = useState<string | null>(null);
   const [texts, setTexts] = useState<TextElement[]>([]);
   const [images, setImages] = useState<ImageElement[]>([]);
-  const Stage = dynamic(
-    () => import("react-konva").then((mod) => mod.Stage),
-  );
-  const Layer = dynamic(
-    () => import("react-konva").then((mod) => mod.Layer),
-  );
+
   useEffect(() => {
     const fetchCertificate = async () => {
       try {

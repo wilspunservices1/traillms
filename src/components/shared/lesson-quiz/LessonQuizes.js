@@ -1,42 +1,89 @@
-"use client";
+import React from "react";
+import LessonQuizSingle from "./LessonQuizSingle";
 
-import React, { useState, useEffect } from "react";
-
-const LessonQuizes = ({ courseId }) => {
-  const [quizzes, setQuizzes] = useState([]);
-
-  useEffect(() => {
-    const fetchQuizzes = async () => {
-      try {
-        const response = await fetch(`/api/questionnaire/${courseId}`);
-        if (!response.ok) throw new Error("Failed to fetch quizzes");
-        const data = await response.json();
-        setQuizzes(data.questions || []);
-      } catch (error) {
-        console.error("Error fetching quizzes:", error);
-      }
-    };
-
-    if (courseId) {
-      fetchQuizzes();
-    }
-  }, [courseId]);
-
-  return (
-    <div>
-      <h2>Quizzes</h2>
-      {quizzes.length === 0 ? (
-        <p>No quizzes available.</p>
-      ) : (
-        quizzes.map((quiz) => (
-          <div key={quiz.id}>
-            <h3>{quiz.question}</h3>
-            {/* Render options or other quiz details here */}
-          </div>
-        ))
-      )}
-    </div>
-  );
+const LessonQuizes = () => {
+  const quizes = [
+    {
+      id: 1,
+      attemptTimes: 1,
+      time: "Time: 5.0 Min",
+      quiz: "What is your favourite song?",
+      options: [
+        {
+          checked: false,
+          name: "Example song 1",
+        },
+        {
+          checked: false,
+          name: "Example song 3",
+        },
+        {
+          checked: true,
+          name: "Example song 2",
+        },
+        {
+          checked: true,
+          name: "Example song 4",
+        },
+      ],
+    },
+    {
+      id: 2,
+      attemptTimes: 1,
+      time: "Time: 4.0 Min",
+      quiz: "What is your best Friend Name?",
+      options: [
+        {
+          checked: false,
+          name: "Example Name 1",
+        },
+        {
+          checked: false,
+          name: "Example Name 3",
+        },
+        {
+          checked: true,
+          name: "Example Name 2",
+        },
+        {
+          checked: true,
+          name: "Example Name 4",
+        },
+      ],
+    },
+    {
+      id: 3,
+      attemptTimes: 1,
+      time: "Time:  6.0 Min",
+      quiz: "What is your best Mentor Name?",
+      options: [
+        {
+          checked: false,
+          name: "Example Name 1",
+        },
+        {
+          checked: false,
+          name: "Example Name 3",
+        },
+        {
+          checked: true,
+          name: "Example Name 2",
+        },
+        {
+          checked: true,
+          name: "Example Name 4",
+        },
+      ],
+    },
+  ];
+  return quizes.map((quiz, idx) => (
+    <LessonQuizSingle
+      key={idx}
+      quiz={quiz}
+      totalQuiz={quizes?.length}
+      idx={idx}
+    />
+  ));
 };
 
 export default LessonQuizes;

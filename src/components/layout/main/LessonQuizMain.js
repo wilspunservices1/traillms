@@ -1,4 +1,3 @@
-"use client";
 import HeroPrimary from "@/components/sections/hero-banners/HeroPrimary";
 import LessonQuizPrimary from "@/components/sections/lesson-quiz/LessonQuizPrimary";
 import React from "react";

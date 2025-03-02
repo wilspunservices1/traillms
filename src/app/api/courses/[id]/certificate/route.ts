@@ -38,7 +38,6 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 
         // Return the certificate template data along with issuance details
         return NextResponse.json({
-            certificateId: certificateTemplate.id,
             certificateData: certificateTemplate[0].certificateData,
             description: certificateTemplate[0].description,
             issuedTo: issuance[0].issuedTo,

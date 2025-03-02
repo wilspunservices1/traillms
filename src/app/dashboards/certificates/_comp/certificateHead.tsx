@@ -13,7 +13,6 @@ interface CertificateHeadProps {
   isLoading?: boolean;
 }
 
-
 const CertificateHead: React.FC<CertificateHeadProps> = ({
   certificateTitle,
   buttonLabel = 'Save',

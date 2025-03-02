@@ -8,7 +8,6 @@ import {
   Transformer as KonvaTransformer,
 } from 'react-konva';
 import { TextElement } from '@/types/type';
-import dynamic from 'next/dynamic';
 import Konva from 'konva';
 
 interface DraggableTextProps {
@@ -19,7 +18,6 @@ interface DraggableTextProps {
   texts: TextElement[]; // Added texts prop here
 }
 
-const Stage = dynamic(() => import("react-konva").then((mod) => mod.Stage));
 const DraggableText: React.FC<DraggableTextProps> = ({
   text,
   isSelected,

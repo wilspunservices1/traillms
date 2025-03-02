@@ -37,7 +37,7 @@ export async function POST(req: Request) {
       .select()
       .from(user)
       .where(eq(user.email, email))
-      .then((res: any[]) => res[0]);
+      .then((res) => res[0]);
 
     if (!existingUser) {
       // If user doesn't exist, create a new user account
@@ -60,7 +60,7 @@ export async function POST(req: Request) {
           activationToken,
         })
         .returning()
-        .then((res: any[]) => res[0]);
+        .then((res) => res[0]);
 
       // Send activation email
       await sendEmail({

@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   try {
     // Authentication (ensure only admins can access)
-    const session = await getSession(req);
+    const session = await getSession();
     if (!session || !session.user || !session.user.roles.includes('admin')) {
       return NextResponse.json(
         { message: 'Unauthorized' },

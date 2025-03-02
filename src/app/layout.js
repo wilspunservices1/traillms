@@ -1,5 +1,6 @@
 import FixedShadow from "@/components/shared/others/FixedShadow";
 import PreloaderPrimary from "@/components/shared/others/PreloaderPrimary";
+
 import { Hind, Inter } from "next/font/google";
 import "@/assets/css/icofont.min.css";
 import "@/assets/css/popup.css";
@@ -11,10 +12,9 @@ import "swiper/css/pagination";
 import "swiper/css/effect-cards";
 import "./globals.css";
 import { getServerSession } from "next-auth/next";
-import { options } from "@/libs/auth";
+import { options } from "@/libs/auth"; // Adjust path as necessary
 import SessionProvider from "@/components/provider/provider"
 import { getSession } from "@/libs/auth";
-import { Providers } from './providers';
 
 export const inter = Inter({
   subsets: ["latin"],
@@ -36,6 +36,7 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }) {
+  // Fetch the session server-side
   const session = await getSession();
 
   return (
@@ -44,11 +45,9 @@ export default async function RootLayout({ children }) {
         className={`relative leading-[1.8] bg-bodyBg dark:bg-bodyBg-dark z-0 ${inter.className}`}
       >
         <PreloaderPrimary />
-        <Providers>
-          <SessionProvider session={session}>
-            {children}
-          </SessionProvider>
-        </Providers>
+        <SessionProvider session={session}>
+          {children}
+        </SessionProvider>
 
         {/* theme fixed shadow */}
         <div>

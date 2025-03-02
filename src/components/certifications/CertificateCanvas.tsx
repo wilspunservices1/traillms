@@ -3,8 +3,7 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
-// import { Stage, Layer } from 'react-konva';
-import dynamic from 'next/dynamic';
+import { Stage, Layer } from 'react-konva';
 import DraggableImage from './DraggableImage';
 import DraggableText from './DraggableText';
 import TextAdjustments from './TextAdjustments';
@@ -40,15 +39,9 @@ const CertificateCanvas: React.FC<CertificateCanvasProps> = ({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [uploading, setUploading] = useState<boolean>(false);
   const stageRef = useRef<any>(null);
-  
   const htmlCertificateRef = useRef<HTMLDivElement>(null); // Add ref for HTML certificate
   const showAlert = useSweetAlert();
-  const Stage = dynamic(
-    () => import("react-konva").then((mod) => mod.Stage),
-  );
-  const Layer = dynamic(
-    () => import("react-konva").then((mod) => mod.Layer),
-  );
+
   // Undo/Redo stacks
   const [history, setHistory] = useState<
     { images: ImageElement[]; texts: TextElement[] }[]
@@ -203,24 +196,14 @@ const CertificateCanvas: React.FC<CertificateCanvasProps> = ({
         const fileName = `certificate-${Date.now()}.png`;
 
         if (!dataUrl.startsWith('data:image/')) {
-          console.error('Invalid image data:', dataUrl);
           throw new Error('Invalid image data.');
         }
 
         const payload = {
           dataUrl,
           description: 'My Certificate',
-          title: 'My HTML Certificate',
           fileName,
-          issuedTo,
-          placeholders: texts.map(text => ({
-            key: text.id,
-            value: text.text,
-            x: text.x,
-            y: text.y,
-            fontSize: text.fontSize,
-            color: text.fill
-          }))
+          issuedTo
         };
 
         response = await fetch('/api/certificates/save-mine', {

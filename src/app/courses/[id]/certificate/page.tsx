@@ -1,12 +1,12 @@
+// src/pages/assign-certificate.tsx
+
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import UserCertificate from '@/components/certifications/user/UserCertificate';
 import UploadCertificate from '@/components/certifications/UploadCertificate';
 import PlaceholderPicker from '@/components/certifications/PlaceholderPicker';
 import SignaturePad from '@/components/certifications/SignaturePad';
-import { useParams } from "next/navigation";
-import { useSession } from "next-auth/react";
 
 type Props = {};
 
@@ -18,55 +18,21 @@ interface UserData {
 }
 
 const AssignCertificate: React.FC<Props> = () => {
-  const params = useParams();
-  const courseId = params.id as string;
-  const { data: session } = useSession();
-
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('');
   const [userData, setUserData] = useState<UserData>({
-    name: session?.user?.name || '',
-    date: new Date().toISOString().split('T')[0],
+    name: '',
+    date: '',
     achievement: '',
     course: '',
   });
   const [signature, setSignature] = useState<string>('');
   const [isPreviewVisible, setIsPreviewVisible] = useState<boolean>(false);
-  const [courseTitle, setCourseTitle] = useState('');
 
-  // Fetch course details and update user data
-  useEffect(() => {
-    const fetchCourseDetails = async () => {
-      try {
-        const response = await fetch(`/api/courses/${courseId}`);
-        const result = await response.json();
-
-        if (result.data) {
-          setUserData((prev) => ({
-            ...prev,
-            course: result.data.title,
-            achievement: `Successfully completed ${result.data.title}`,
-          }));
-          setCourseTitle(result.data.title);
-        } else {
-          throw new Error(result.message || 'Failed to fetch course details');
-        }
-      } catch (error) {
-        console.error('Error fetching course details:', error);
-      }
-    };
-
-    if (courseId && session?.user) {
-      fetchCourseDetails();
-    }
-  }, [courseId, session]);
-
-  // Handle template selection
   const handleTemplateSelect = (templateId: string) => {
     setSelectedTemplateId(templateId);
     setIsPreviewVisible(false); // Hide the preview when selecting a new template
   };
 
-  // Update user data dynamically
   const handleUserDataChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setUserData({
       ...userData,
@@ -74,12 +40,10 @@ const AssignCertificate: React.FC<Props> = () => {
     });
   };
 
-  // Save the signature data
   const handleSignatureSave = (dataUrl: string) => {
     setSignature(dataUrl);
   };
 
-  // Generate the certificate preview
   const handleGenerateCertificate = () => {
     if (!selectedTemplateId) {
       alert('Please select a certificate template.');
@@ -88,7 +52,6 @@ const AssignCertificate: React.FC<Props> = () => {
     setIsPreviewVisible(true);
   };
 
-  // Insert a placeholder into the achievement field
   const handleInsertPlaceholder = (placeholder: string) => {
     setUserData((prev) => ({
       ...prev,
@@ -97,58 +60,112 @@ const AssignCertificate: React.FC<Props> = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 text-center mb-8 pb-2 border-b-2 border-indigo-500">
-          Course Certificate
-        </h1>
+    <div className="min-h-screen bg-gray-100 p-6">
+      <h1 className="text-3xl font-bold text-center mb-6">Assign Certificate to User</h1>
 
-        {/* Certificate Template Selection */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-            <span className="bg-indigo-600 text-black rounded-full w-6 h-6 inline-flex items-center justify-center mr-2">1</span>
-            Get Your Certificate
-          </h2>
-          <UploadCertificate 
-            onTemplateSelect={handleTemplateSelect} 
-            courseTitle={courseTitle}
+      {/* Section: Select Certificate Template */}
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold mb-2">1. Select Certificate Template</h2>
+        {/* <UploadCertificate onTemplateSelect={handleTemplateSelect} /> */}
+      </div>
+
+      {/* Section: Enter User Details */}
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold mb-2">2. Enter User Details</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              User Name
+            </label>
+            <input
+              type="text"
+              name="name"
+              id="name"
+              value={userData.name}
+              onChange={handleUserDataChange}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+              placeholder="Enter user's name"
+            />
+          </div>
+          <div>
+            <label htmlFor="course" className="block text-sm font-medium text-gray-700">
+              Course
+            </label>
+            <input
+              type="text"
+              name="course"
+              id="course"
+              value={userData.course}
+              onChange={handleUserDataChange}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+              placeholder="Enter course name"
+            />
+          </div>
+          <div>
+            <label htmlFor="date" className="block text-sm font-medium text-gray-700">
+              Date
+            </label>
+            <input
+              type="date"
+              name="date"
+              id="date"
+              value={userData.date}
+              onChange={handleUserDataChange}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+            />
+          </div>
+          <div className="md:col-span-2">
+            <label htmlFor="achievement" className="block text-sm font-medium text-gray-700">
+              Achievement
+            </label>
+            <textarea
+              name="achievement"
+              id="achievement"
+              value={userData.achievement}
+              onChange={handleUserDataChange}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+              placeholder="Describe the achievement"
+              rows={3}
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      {/* Section: Insert Placeholders */}
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold mb-2">3. Insert Placeholders</h2>
+        <PlaceholderPicker
+          placeholders={['{Name}', '{Date}', '{Achievement}', '{Course}']}
+          onInsertPlaceholder={handleInsertPlaceholder}
+        />
+      </div>
+
+      {/* Section: Add Signature */}
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold mb-2">4. Add Signature</h2>
+        <SignaturePad onSave={handleSignatureSave} />
+      </div>
+
+      {/* Section: Generate Certificate */}
+      <div className="mb-6 text-center">
+        <button
+          onClick={handleGenerateCertificate}
+          className="px-6 py-3 bg-indigo-600 text-white rounded-md"
+        >
+          Generate Certificate
+        </button>
+      </div>
+
+      {/* Section: Preview Certificate */}
+      {isPreviewVisible && (
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold mb-2">Preview Certificate</h2>
+          <UserCertificate
+            certificateId={selectedTemplateId}
+            userData={userData}
           />
         </div>
-
-        {/* Signature Section */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-            <span className="bg-indigo-600 text-white rounded-full w-6 h-6 inline-flex items-center justify-center mr-2">4</span>
-            Digital Signature
-          </h2>
-          <SignaturePad onSave={handleSignatureSave} />
-        </div>
-
-        {/* Generate Button */}
-        <div className="text-center mb-8">
-          <button
-            onClick={handleGenerateCertificate}
-            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
-          >
-            Generate Certificate
-          </button>
-        </div>
-
-        {/* Certificate Preview */}
-        {isPreviewVisible && (
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">
-              Certificate Preview
-            </h2>
-            <div className="border-2 border-gray-200 rounded-lg p-4">
-              <UserCertificate
-                certificateId={selectedTemplateId}
-                userData={userData}
-              />
-            </div>
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 };

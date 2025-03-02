@@ -6,7 +6,6 @@ import React, { useRef, useEffect } from 'react';
 import { Image as KonvaImage, Transformer as KonvaTransformer } from 'react-konva';
 import useImage from 'use-image';
 import Konva from 'konva';
-import dynamic from 'next/dynamic';
 import { ImageElement } from '@/types/type';
 
 interface DraggableImageProps {
@@ -64,7 +63,7 @@ const DraggableImage: React.FC<DraggableImageProps> = ({
 
       setImages(updatedImages);
     }
-  }, [img, containerWidth, containerHeight, images, setImages, image.id]);
+  }, [img, containerWidth, containerHeight]);
 
   useEffect(() => {
     if (isSelected && trRef.current && shapeRef.current) {

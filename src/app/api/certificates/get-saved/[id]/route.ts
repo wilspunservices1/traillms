@@ -19,7 +19,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     }
 
     // Retrieve the session
-    let session = await getSession(req);
+    let session = await getSession();
 
     // For testing: Mock session if null and in development
     if (!session && process.env.NODE_ENV === 'development') {

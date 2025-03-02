@@ -1,4 +1,3 @@
-"use client";
 import ButtonPrimary from "@/components/shared/buttons/ButtonPrimary";
 import LessonQuizResults from "@/components/shared/lesson-quiz/LessonQuizResults";
 import LessonQuizes from "@/components/shared/lesson-quiz/LessonQuizes";

@@ -13,3 +13,7 @@ export const orders = pgTable('Orders', {
   createdAt: timestamp('createdAt').defaultNow().notNull(), // Track when the order was made
   updatedAt: timestamp('updatedAt').defaultNow().notNull(), // Track when the order was last updated
 });
+
+
+
+// Note : Now i want to create an api  base on order history , user courses , enroll course 

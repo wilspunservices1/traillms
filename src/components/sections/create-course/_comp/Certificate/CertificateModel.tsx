@@ -3,7 +3,17 @@
 import React, { useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import CertificateDetails from "./CertificateDetails";
-import {Certificate} from "../../../../../types/certificates"
+
+interface Certificate {
+  id: string;
+  ownerId: string;
+  certificateData: string;
+  description: string;
+  uniqueIdentifier: string;
+  isPublished: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
 interface CertificateModalProps {
   certificate: Certificate;

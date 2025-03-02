@@ -14,7 +14,7 @@ export async function GET(
   { params }: { params: { userId: string } }
 ) {
   try {
-    const { userId } = await params;
+    const userId = params.userId;
     const url = new URL(req.url);
     const progressQuery = url.searchParams.get('progress'); // Optional query param for progress
 
@@ -48,7 +48,7 @@ export async function GET(
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-
+   
 
     // Extract enrolledCourses from user
     const enrolledCourses = foundUsers[0].enrolledCourses || [];
@@ -165,7 +165,7 @@ export async function GET(
       return {
         courseId: course.courseId,
         progress: course.progress,
-        completedLectures: course.completedLectures,
+        completedLectures : course.completedLectures,
         chapters: chaptersWithLectureIds,
       };
     });

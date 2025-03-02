@@ -4,10 +4,10 @@ import DashboardContainer from "@/components/shared/containers/DashboardContaine
 import ThemeController from "@/components/shared/others/ThemeController";
 import DsahboardWrapper from "@/components/shared/wrappers/DsahboardWrapper";
 import PageWrapper from "@/components/shared/wrappers/PageWrapper";
-// export const metadata = {
-//   title: "Instructor Dashboard | Meridian LMS - Education LMS Template",
-//   description: "Instructor Dashboard | Meridian LMS - Education LMS Template",
-// };
+export const metadata = {
+  title: "Instructor Dashboard | Meridian LMS - Education LMS Template",
+  description: "Instructor Dashboard | Meridian LMS - Education LMS Template",
+};
 const Instructor_Dashboard = () => {
   return (
     <PageWrapper>

@@ -20,8 +20,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 export async function POST(req: NextRequest) {
   const body = await req.text(); // Parse raw body as text for signature verification
   const endpointSecret = process.env.STRIPE_SECRET_WEBHOOK_KEY!;
-  const headersList = await headers();
-  const sig = headersList.get("stripe-signature") as string;
+  const sig = headers().get("stripe-signature") as string;
 
   let event: Stripe.Event;
 
@@ -229,6 +228,7 @@ export async function POST(req: NextRequest) {
     return new Response("Event ignored", { status: 200 });
   }
 }
+
 // // src/app/api/stripe/webhook.ts
 
 // import { NextRequest } from 'next/server';
@@ -603,4 +603,3 @@ export async function POST(req: NextRequest) {
 //     return new Response("Event ignored", { status: 200 });
 //   }
 // }
-

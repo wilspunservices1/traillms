@@ -362,12 +362,12 @@ h6 {
   fill: var(--blue);
 }
 /* create course */
-.-course .active .accordion-controller {
+.create-course .active .accordion-controller {
   background-color: transparent;
   border-bottom: 1px solid var(--borderColor2);
 }
 
-.-course .active .accordion-controller:focus {
+.create-course .active .accordion-controller:focus {
   box-shadow: 0 0 0 0.25rem var(--blue2);
   border-bottom: 1px solid transparent;
 }
@@ -498,6 +498,8 @@ h6 {
   overflow: hidden;
 }
 
+
+
 /* vedio player config */
 .videoSection {
   position: relative;
@@ -528,7 +530,7 @@ h6 {
 .playButton {
   width: 60px;
   height: 60px;
-  background: url("/path-to-play-icon.png") center center / contain no-repeat;
+  background: url('/path-to-play-icon.png') center center / contain no-repeat;
 }
 
 .topBar {
@@ -544,6 +546,7 @@ h6 {
   margin-left: 20px;
   padding: 5px 10px;
 }
+
 
 /* file modal */
 /* Add to your global CSS or component-specific CSS */
@@ -585,36 +588,19 @@ h6 {
   transform: translateX(0); /* Slide in */
 }
 
+
+
 /* // tailwind directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+
 @layer components {
   .form-label {
-    @apply mb-3 block font-semibold;
+    @apply mb-3 block font-semibold
   }
   .form-input {
-    @apply w-full py-10px px-5 text-sm focus:outline-none text-contentColor dark:text-contentColor-dark bg-whiteColor dark:bg-whiteColor-dark border-2 border-borderColor dark:border-borderColor-dark placeholder:text-placeholder placeholder:opacity-80 leading-23px rounded-md;
+    @apply w-full py-10px px-5 text-sm focus:outline-none text-contentColor dark:text-contentColor-dark bg-whiteColor dark:bg-whiteColor-dark border-2 border-borderColor dark:border-borderColor-dark placeholder:text-placeholder placeholder:opacity-80 leading-23px rounded-md 
   }
-}
-
-/* Add these styles to remove any black backgrounds */
-.certificate-container {
-  background-color: white;
-  background: transparent !important;
-  border: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
-.certificate-container::before,
-.certificate-container::after {
-  display: none;
-}
-
-body,
-#__next,
-main {
-  background-color: white;
 }

@@ -50,7 +50,7 @@ const CopyRight = () => {
             >
               <Image src={logoImage} alt="" placeholder="blur" />
               <div className="flex  items-start text-left">
-                <span className="font-bold text-xl text-white pl-0">
+                <span className="font-bold text-xl text-white pl-2">
                   Meridian
                 </span>
                 <span className="font-bold text-xl pl-2 text-yellow">
@@ -60,7 +60,7 @@ const CopyRight = () => {
             </Link>
           </div>
 
-          <div className="lg:col-start-4 lg:col-span-6 pl-10">
+          <div className="lg:col-start-4 lg:col-span-6">
             <p className="text-whiteColor">
               Copyright © 2024  by
               MeridianLMS. All Rights Reserved.

@@ -4,7 +4,7 @@ import { courses } from '@/db/schemas/courses'; // Import courses schema
 import { eq, and, sql } from 'drizzle-orm'; // For building conditions
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-  const courseId = await params.id;
+  const courseId = params.id;
   const { searchParams } = new URL(req.url);
   const isPublished = searchParams.get('isPublished') === 'true'; // Convert query param to boolean
 

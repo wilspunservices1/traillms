@@ -8,10 +8,6 @@ interface VideoPlayerProps {
 }
 
 const getVideoSrc = (url: string): string => {
-
-  if (!/^https?:\/\//i.test(url)) {
-    return url;
-  }
   try {
     const parsedUrl = new URL(url);
 

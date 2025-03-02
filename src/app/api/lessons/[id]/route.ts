@@ -11,7 +11,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const lessonId = await params.id;
+    const lessonId = params.id;
 
     // Get the user session
     const token = await getToken({ req });

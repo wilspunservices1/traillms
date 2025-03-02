@@ -6,7 +6,8 @@ import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import getItemsFromLocalstorage from "@/libs/getItemsFromLocalstorage";
 
-const assignColorsToCategories = (categories, depBgs) => {
+const assignColorsToCategories = (categories , depBgs) => {
+
   if (!categories) {
     return [];
   }
@@ -24,8 +25,11 @@ const CourseCard2 = ({
   isNotSidebar,
   enrolledCourses,
 }) => {
-  const { addProductToWishlist, deleteProductFromWishlist, wishlistProducts } =
-    useWishlistContext();
+  const {
+    addProductToWishlist,
+    deleteProductFromWishlist,
+    wishlistProducts,
+  } = useWishlistContext();
   const { data: session } = useSession();
   const [isInWishlist, setIsInWishlist] = useState(false);
 
@@ -54,8 +58,9 @@ const CourseCard2 = ({
 
   // Find progress for the current course from enrolledCourses
   const progress =
-    enrolledCourses?.find((enrolledCourse) => enrolledCourse.courseId === id)
-      ?.progress || 0;
+    enrolledCourses?.find(
+      (enrolledCourse) => enrolledCourse.courseId === id
+    )?.progress || 0;
 
   useEffect(() => {
     const wishlistFromLocalStorage = getItemsFromLocalstorage("wishlist") || [];
@@ -111,7 +116,6 @@ const CourseCard2 = ({
               <CldImage
                 width="400"
                 height="300"
-                alt=""
                 src={thumbnail}
                 sizes={"20w"}
                 className="object-cover w-full h-full"
@@ -263,6 +267,7 @@ const CourseCard2 = ({
 };
 
 export default CourseCard2;
+
 
 // "use client";
 // import { useWishlistContext } from "@/contexts/WshlistContext";
@@ -525,6 +530,7 @@ export default CourseCard2;
 
 // export default CourseCard2;
 
+
 // "use client";
 // import { useWishlistContext } from "@/contexts/WshlistContext";
 // import { CldImage } from "next-cloudinary";
@@ -620,7 +626,7 @@ export default CourseCard2;
 //           <div className={`w-full ${card ? "lg:w-3/5" : "md:w-65% "}`}>
 //             <div
 //               className={`${`pl-0 md:pl-5  lg:pl-30px  ${isNotSidebar ? "2xl:pl-90px" : ""
-//                 }`}
+//                 }`} 
 //               `}
 //             >
 //               <div className="grid grid-cols-2 mb-15px">
@@ -671,6 +677,7 @@ export default CourseCard2;
 //               </div>
 //               {/*  bottom */}
 //               <div className="flex flex-wrap justify-between sm:flex-nowrap items-center gap-y-2 pt-15px border-t border-borderColor">
+
 
 //                 <div className="flex ml-auto ">
 //                   <Link

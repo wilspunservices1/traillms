@@ -33,7 +33,7 @@ const NavItems = () => {
     {
       id: 4,
       name: "Privacy Policy",
-      path: "/privacy",
+      path: "/courses#privacy",
       // dropdown: <DropdownDashboard />,
       isRelative: true,
     },

@@ -73,7 +73,7 @@ export async function PATCH(req: Request, { params }: { params: { userId: string
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await getSession(req);
+    const session = await getSession();
     const userId = session?.user?.id;
 
     if (!userId) {

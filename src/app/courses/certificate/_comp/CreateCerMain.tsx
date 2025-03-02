@@ -1,82 +1,67 @@
-'use client';
+// pages/create-certification.tsx
+
+'use client'; // Ensure this is the first line
 
 import { useState, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/navigation';
 import HeroPrimary from '@/components/sections/hero-banners/HeroPrimary';
 import { ImageElement, TextElement } from '@/types/type';
 import { useSession } from 'next-auth/react';
 import { Session } from 'next-auth';
 import { redirect } from 'next/navigation';
 
+
+// Dynamically import client components
 const ImageUploader = dynamic(
   () => import('@/components/certifications/ImageUploader'),
+  { ssr: false }
 );
 const TextInput = dynamic(
   () => import('@/components/certifications/TextInput'),
+  { ssr: false }
 );
 const SignaturePad = dynamic(
   () => import('@/components/certifications/SignaturePad'),
+  { ssr: false }
 );
 const CertificateCanvas = dynamic(
   () => import('@/components/certifications/CertificateCanvas'),
+  { ssr: false }
 );
 const PlaceholderPicker = dynamic(
   () => import('@/components/certifications/PlaceholderPicker'),
+  { ssr: false }
 );
 const ImageMultiSelect = dynamic(
   () => import('@/components/certifications/ImageMultiSelect'),
+  { ssr: false }
 );
 
+
 const CreateCertificationPage: React.FC = () => {
-  const router = useRouter();
   const [images, setImages] = useState<ImageElement[]>([]);
   const [texts, setTexts] = useState<TextElement[]>([]);
+
+  // State for multi-select
   const [selectedImages, setSelectedImages] = useState<any[]>([]);
+
+  // State for Design Mode
   const [designMode, setDesignMode] = useState<'image' | 'html'>('image');
   const { data: session } = useSession() as { data: Session | null };
+
+  // State for HTML Design
   const [htmlContent, setHtmlContent] = useState<string>('');
   const [placeholders, setPlaceholders] = useState<string[]>([
     '%{{username}}',
     '%{{signature}}',
     '%{{date}}',
     '%{{course}}',
+    // Add more placeholders as needed
   ]);
 
   if(!session) {
     redirect("/")
   }
-
-  const handleSaveCertificate = async () => {
-    try {
-      // Your existing save logic here
-      const certificateData = {
-        images,
-        texts,
-        htmlContent,
-        designMode,
-        // Add any other data you need to save
-      };
-
-      const response = await fetch('/api/certificates', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(certificateData),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save certificate');
-      }
-
-      // Navigate to create-certificate page after successful save
-      router.push('/courses/certificate/create-certificate');
-      
-    } catch (error) {
-      console.error('Error saving certificate:', error);
-    }
-  };
 
   const handleImageUpload = (src: string) => {
     const newImage: ImageElement = {
@@ -107,13 +92,15 @@ const CreateCertificationPage: React.FC = () => {
     handleImageUpload(dataUrl);
   };
 
+  // Handle selection from multi-select
   const handleSelectExistingImages = () => {
     selectedImages.forEach((image) => {
+      // Prevent adding duplicate images
       if (!images.find((img) => img.src === image.value)) {
         const existingImage: ImageElement = {
           id: `image-${Date.now()}-${Math.random()}`,
           src: image.value,
-          x: 50 + images.length * 10,
+          x: 50 + images.length * 10, // Offset to prevent overlap
           y: 50 + images.length * 10,
           width: 100,
           height: 100,
@@ -123,13 +110,16 @@ const CreateCertificationPage: React.FC = () => {
     });
   };
 
+  // Handle Design Mode Change
   const handleDesignModeChange = (mode: 'image' | 'html') => {
     setDesignMode(mode);
+    // Reset relevant states when switching modes
     setImages([]);
     setTexts([]);
     setHtmlContent('');
   };
 
+  // Handle inserting placeholder into HTML content
   const htmlTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleInsertPlaceholder = (placeholder: string) => {
@@ -141,8 +131,10 @@ const CreateCertificationPage: React.FC = () => {
       const after = htmlContent.substring(endPos, htmlContent.length);
       const newContent = before + placeholder + after;
       setHtmlContent(newContent);
+      // Move the cursor position after the inserted placeholder
       setTimeout(() => {
-        textarea.selectionStart = textarea.selectionEnd = startPos + placeholder.length;
+        textarea.selectionStart = textarea.selectionEnd =
+          startPos + placeholder.length;
         textarea.focus();
       }, 0);
     }
@@ -156,6 +148,7 @@ const CreateCertificationPage: React.FC = () => {
       />
       <div className="min-h-screen bg-gray-50 flex flex-col items-center py-8">
         <div className="w-full max-w-7xl bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+          {/* Design Mode Selection */}
           <div className="mb-8">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Choose Design Mode:
@@ -187,9 +180,11 @@ const CreateCertificationPage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Column: Controls */}
             <div className="lg:col-span-1 space-y-8">
               {designMode === 'image' ? (
                 <>
+                  {/* Image Design Controls */}
                   <ImageUploader onImageUpload={handleImageUpload} />
                   <ImageMultiSelect
                     selectedImages={selectedImages}
@@ -203,9 +198,11 @@ const CreateCertificationPage: React.FC = () => {
                   </button>
                   <TextInput onAddText={handleAddText} />
                   <SignaturePad onSave={handleSignatureSave} />
+                  {/* Additional controls can be added here */}
                 </>
               ) : (
                 <>
+                  {/* HTML Design Controls */}
                   <div className="space-y-4">
                     <label className="block text-sm font-medium text-gray-700">
                       Paste HTML Code:
@@ -219,6 +216,7 @@ const CreateCertificationPage: React.FC = () => {
                       placeholder="<html><body><h1>Certificate</h1><p>%{{username}}</p><p>%{{signature}}</p></body></html>"
                     />
                   </div>
+                  {/* Placeholder Picker */}
                   <div className="space-y-4">
                     <PlaceholderPicker
                       placeholders={placeholders}
@@ -227,16 +225,9 @@ const CreateCertificationPage: React.FC = () => {
                   </div>
                 </>
               )}
-              
-              {/* Save Button */}
-              <button
-                onClick={handleSaveCertificate}
-                className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors duration-300"
-              >
-                Save Certificate
-              </button>
             </div>
 
+            {/* Right Column: Canvas and Adjustments */}
             <div className="lg:col-span-2 flex flex-col">
               <CertificateCanvas
                 images={images}

@@ -61,7 +61,7 @@ const PieChartDashboard = () => {
         pieChart.destroy();
       };
     }
-  }, [dataFetched, paymentMethodData]);
+  }, [dataFetched]);
 
   return (
     <div className="w-full md:w-1/2 lg:w-1/3 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">

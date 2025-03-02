@@ -3,7 +3,17 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {Certificate} from "../../../../../types/certificates"
+
+interface Certificate {
+  id: string;
+  ownerId: string;
+  certificateData: string;
+  description: string;
+  uniqueIdentifier: string;
+  isPublished: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
 interface CertificateDetailsProps {
   isModal: boolean;
@@ -11,10 +21,10 @@ interface CertificateDetailsProps {
 }
 
 const CertificateDetails: React.FC<CertificateDetailsProps> = ({ isModal, certificate }) => {
-  const { id, certificate_data_url, description, unique_identifier } = certificate || {};
+  const { id, certificateData, description, uniqueIdentifier } = certificate || {};
 
-  // If 'unique_identifier' is not available, use 'description' or a generic string
-  const displayTitle = unique_identifier || "Certificate";
+  // If 'uniqueIdentifier' is not available, use 'description' or a generic string
+  const displayTitle = uniqueIdentifier || "Certificate";
 
   // Additional Validation for Image URL
   const isImageUrlValid = (url: string): boolean => {
@@ -32,9 +42,9 @@ const CertificateDetails: React.FC<CertificateDetailsProps> = ({ isModal, certif
       <div className="relative">
         <div className="md:sticky top-20">
           {/* Display Certificate Image */}
-          {certificate_data_url && isImageUrlValid(certificate_data_url) ? (
+          {certificateData && isImageUrlValid(certificateData) ? (
             <Image
-              src={certificate_data_url}
+              src={certificateData}
               alt={description || "Certificate Image"}
               className="w-full object-cover rounded-lg shadow-md"
               width={600}
@@ -71,11 +81,11 @@ const CertificateDetails: React.FC<CertificateDetailsProps> = ({ isModal, certif
 
         {/* Additional Information (Optional) */}
         <div className="text-sm text-gray-600 dark:text-gray-300">
-          <p><strong>Unique ID:</strong> {unique_identifier}</p>
-          <p><strong>Owner ID:</strong> {certificate.owner_id}</p>
-          <p><strong>Created At:</strong> {certificate.created_at ? new Date(certificate.created_at).toLocaleString() : "N/A"}</p>
-          <p><strong>Last Updated:</strong> {certificate.updated_at ? new Date(certificate.updated_at).toLocaleString() : "N/A"}</p>
-          <p><strong>Published:</strong> {certificate.is_published ? "Yes" : "No"}</p>
+          <p><strong>Unique ID:</strong> {uniqueIdentifier}</p>
+          <p><strong>Owner ID:</strong> {certificate.ownerId}</p>
+          <p><strong>Created At:</strong> {new Date(certificate.createdAt).toLocaleString()}</p>
+          <p><strong>Last Updated:</strong> {new Date(certificate.updatedAt).toLocaleString()}</p>
+          <p><strong>Published:</strong> {certificate.isPublished ? "Yes" : "No"}</p>
         </div>
       </div>
     </div>

@@ -392,7 +392,7 @@ export async function GET(
   req: Request,
   { params }: { params: { userId: string } }
 ) {
-  const { userId } = await params;
+  const { userId } = params;
 
   // Validate that userId is provided
   if (!userId) {

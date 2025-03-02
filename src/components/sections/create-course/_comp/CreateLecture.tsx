@@ -140,7 +140,7 @@ const CreateLecture: React.FC<CreateLectureProps> = ({
       chapterId,
       title: title || "Untitled Lecture", // Add fallback if title is missing
       description: description || "No description", // Add fallback for description
-      duration: parseInt(duration, 10) || "0", // Default duration if not provided
+      duration: duration || "0", // Default duration if not provided
       videoUrl,
       isPreview,
       isLocked,
