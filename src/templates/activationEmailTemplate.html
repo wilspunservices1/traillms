@@ -1,0 +1,139 @@
+<!-- START HEAD -->
+<head>
+    <!-- CHARSET -->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    
+    <!-- MOBILE FIRST -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    
+    <!-- GOOGLE FONTS -->
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu+Mono|Ubuntu" rel="stylesheet">
+    
+    <!-- RESPONSIVE CSS -->
+    <style type="text/css">
+        @media only screen and (max-width: 550px) {
+            .responsive_at_550 {
+                width: 90% !important;
+                max-width: 90% !important;
+            }
+        }
+        body {
+            font-family: 'Ubuntu', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #1976D2;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .header img {
+            max-width: 50px;
+            margin-right: 15px;
+        }
+        .header h1 {
+            color: #ffffff;
+            font-size: 24px;
+            margin: 0;
+            font-weight: bold;
+            font-family: 'Ubuntu', sans-serif;
+        }
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+        .content h1 {
+            font-family: 'Ubuntu Mono', monospace;
+            font-size: 24px;
+            color: #333333;
+            margin-bottom: 20px;
+        }
+        .content p {
+            font-size: 16px;
+            color: #666666;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        .button {
+            display: inline-block;
+            padding: 15px 30px;
+            background-color: #1976D2;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-family: 'Ubuntu Mono', monospace;
+            font-size: 16px;
+        }
+        .verfyButton {
+            display: inline-block;
+            padding: 15px 30px;
+            background-color: #1976D2;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-family: 'Ubuntu Mono', monospace;
+            font-size: 16px;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #aaaaaa;
+        }
+        .footer a {
+            color: #1976D2;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<!-- END HEAD -->
+
+<!-- START BODY -->
+<body>
+    <div class="container">
+        <!-- START HEADER -->
+        <div class="header">
+            <img src="https://res.cloudinary.com/drnk4gdn2/image/upload/v1724579071/favicon_kguudl.png" alt="Company Logo" />
+            <h1>Meridian LMS</h1>
+        </div>
+        <!-- END HEADER -->
+
+        <!-- START CONTENT -->
+        <div class="content">
+            <h1>Thank you for Registering, {{name}}!</h1>
+            <p>You are just one step away from completing your registration. Please click the button below to verify your email address and activate your account:</p>
+            <a href="{{activationLink}}" class="verfyButton">Verify Email Address</a>
+            <p>If you did not request this, please ignore this email.</p>
+        </div>
+        <!-- END CONTENT -->
+
+        <!-- START FOOTER -->
+        <div class="footer">
+            <p>&copy; 2024 Meridian LMS. All rights reserved.</p>
+            <p>
+                <a href="https://www.facebook.com/YourCompany">Facebook</a> |
+                <a href="https://twitter.com/YourCompany">Twitter</a> |
+                <a href="https://linkedin.com/company/YourCompany">LinkedIn</a> |
+                <a href="https://github.com/YourCompany">GitHub</a>
+            </p>
+            <p>
+                <a href="https://yourcompany.com/terms-of-service">Terms of Service</a> |
+                <a href="https://yourcompany.com/privacy-policy">Privacy Policy</a>
+            </p>
+        </div>
+        <!-- END FOOTER -->
+    </div>
+</body>
+<!-- END BODY -->
