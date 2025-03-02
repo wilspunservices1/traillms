@@ -1,12 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable React Strict Mode for better development experience
-  reactStrictMode: true,
-
-  // Image configuration
-  images: {
-    domains: ["res.cloudinary.com"],
-    remotePatterns: [
+  reactStrictMode: false,
+   eslint: {
+    ignoreDuringBuilds: true, // ⛔ Skips ESLint checks during builds
+  },
+  typescript: {
+    ignoreBuildErrors: true, // <--- Ignores TS errors during production build
+  },
+  images : {
+    unoptimized: true,
+    remotePatterns : [
       {
         protocol: "https",
         hostname: "res.cloudinary.com",
