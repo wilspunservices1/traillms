@@ -22,6 +22,7 @@
 		"canvas": "^3.1.0",
 		"chart.js": "^4.4.2",
 		"cloudinary": "^2.4.0",
+		"critters": "^0.0.23",
 		"dompurify": "^3.1.7",
 		"dotenv": "^16.4.5",
 		"drizzle-orm": "^0.33.0",
