@@ -34,7 +34,7 @@ const nextConfig = {
     config.resolve.alias = {
       ...config.resolve.alias,
       "@": path.resolve(__dirname, "src"),
-      "@/db": path.resolve(__dirname, "src/db/index"),
+      "@/db": path.resolve(__dirname, "src/db"),
       "@/components": path.resolve(__dirname, "src/components"),
     };
 
