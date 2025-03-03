@@ -1,4 +1,4 @@
-import allInstructors from "@/../../public/fakedata/instructors.json";
+import allInstructors from "../../public/fakedata/instructors.json";
 import teacherImag1 from "@/assets/images/teacher/teacher__1.png";
 import teacherImag2 from "@/assets/images/teacher/teacher__2.png";
 import teacherImag3 from "@/assets/images/teacher/teacher__3.png";
