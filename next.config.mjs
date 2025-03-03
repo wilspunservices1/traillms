@@ -1,3 +1,5 @@
+import path from "path";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
@@ -26,14 +28,25 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === "production",
   },
 
-  // Webpack configuration for better module resolution
+  // Webpack configuration for alias resolution & fallback
   webpack: (config) => {
+    // ✅ Add alias resolution
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      "@": path.resolve(__dirname, "src"),
+      "@/db": path.resolve(__dirname, "src/db/index"),
+      "@/components": path.resolve(__dirname, "src/components"),
+    };
+
+    // ✅ Preserve existing fallback settings
     config.resolve.fallback = {
       ...config.resolve.fallback,
-      fs: false,
+      fs: false, // Prevents errors when fs module is not needed
     };
+
     return config;
   },
+
 
   // Experimental features
   experimental: {
