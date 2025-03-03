@@ -1,4 +1,4 @@
-"use client";
+ "use client";
 import TabButtonPrimary from "@/components/shared/buttons/TabButtonPrimary";
 import LoginForm from "@/components/shared/login/LoginForm";
 import SignUpForm from "@/components/shared/login/SignUpForm";
