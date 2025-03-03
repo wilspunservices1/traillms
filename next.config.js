@@ -31,13 +31,13 @@ const nextConfig = {
 
   // Webpack configuration for alias resolution & fallback
   webpack: (config) => {
-    // ✅ Add alias resolution
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      "@": path.resolve(__dirname, "src"),
-      "@/db": path.resolve(__dirname, "src/db/index"),
-      "@/components": path.resolve(__dirname, "src/components"),
-    };
+  config.resolve.alias = {
+    ...config.resolve.alias,
+    "@": path.resolve(__dirname, "src"),
+    "@/db": path.resolve(__dirname, "src/db"), // ✅ Fix path
+    "@/components": path.resolve(__dirname, "src/components"),
+    "@/assets": path.resolve(__dirname, "src/assets"), // ✅ Ensure assets alias exists
+  };
 
     // ✅ Preserve existing fallback settings
     config.resolve.fallback = {
